@@ -30,4 +30,4 @@ linters-settings:
         sections:
             - standard
             - default
-            - prefix(github.com/yngvark.com/go-cmd-template)
+            - prefix(github.com/yngvark.com/gclone)

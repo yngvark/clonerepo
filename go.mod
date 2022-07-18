@@ -1,4 +1,4 @@
-module github.com/yngvark.com/go-cmd-template
+module github.com/yngvark.com/gclone
 
 go 1.18
 

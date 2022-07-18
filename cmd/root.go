@@ -5,12 +5,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/yngvark.com/go-cmd-template/pkg/hello_printer"
+	"github.com/yngvark.com/gclone/pkg/hello_printer"
 )
 
 func Run() {
 	cmd := &cobra.Command{
-		Use:          "my-command",
+		Use:          "gclone",
 		Short:        "My-command does this and that.",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {

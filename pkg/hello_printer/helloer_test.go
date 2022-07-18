@@ -3,7 +3,7 @@ package hello_printer_test
 import (
 	"testing"
 
-	"github.com/yngvark.com/go-cmd-template/pkg/hello_printer"
+	"github.com/yngvark.com/gclone/pkg/hello_printer"
 
 	"github.com/stretchr/testify/assert"
 )
