@@ -1,9 +1,9 @@
-package hello_printer_test
+package cmd_test
 
+/*
 import (
+	"github.com/yngvark.com/gclone/cmd"
 	"testing"
-
-	"github.com/yngvark.com/gclone/pkg/hello_printer"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -14,9 +14,11 @@ func TestSayHello(t *testing.T) {
 	testCases := []struct {
 		name   string
 		expect string
+		cmd    string
 	}{
 		{
 			name:   "Should work",
+			cmd:    "gclone clonerepo git@github.com:yngvark/some-repo.git",
 			expect: "Hello",
 		},
 	}
@@ -25,7 +27,13 @@ func TestSayHello(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			assert.Equal(t, tc.expect, hello_printer.Hello())
+
+			root := cmd.BuildCommand()
+			err := root.Execute()
+
+			assert.NoError(t, err)
+			//assert.Equal(t, tc.expect, clonerepo.Hello())
 		})
 	}
 }
+*/

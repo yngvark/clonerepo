@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [[ -n $FISH_EXISTS ]]; then
+  # shellcheck disable=SC2068
+  gclone clonerepo --print-output-dir fish $@
+else
+  # shellcheck disable=SC2068
+  gclone clonerepo --print-output-dir sh $@
+fi
