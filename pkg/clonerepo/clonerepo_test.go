@@ -6,7 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/yngvark.com/gclone/pkg/testhelper/build"
+	"github.com/yngvark.com/gclone/pkg/testhelper/build_executable"
+
 	"github.com/yngvark.com/gclone/pkg/testhelper/execute"
 	"github.com/yngvark.com/gclone/pkg/testhelper/store"
 
@@ -15,7 +16,7 @@ import (
 
 func TestCloneRepo(t *testing.T) {
 	t.Parallel()
-	build.Run(t)
+	build_executable.Run(t)
 
 	testCases := []struct {
 		name   string
@@ -23,7 +24,7 @@ func TestCloneRepo(t *testing.T) {
 		// cmd    string
 	}{
 		{
-			name: "Should work",
+			name: "Should not crash",
 			// cmd:    "gclone clonerepo git@github.com:yngvark/some-repo.git",
 			expect: "Hello",
 		},
@@ -44,7 +45,7 @@ func TestCloneRepo(t *testing.T) {
 			command.Env = []string{
 				"GCLONE_GIT_DIR=" + storage.BasePath,
 				"INTERNAL__CLONE_TEST_REPO=true",
-				fmt.Sprintf("PATH=%s:%s", build.ProjectBuildDir(), os.Getenv("PATH")),
+				fmt.Sprintf("PATH=%s:%s", build_executable.ProjectBuildDir(), os.Getenv("PATH")),
 			}
 			command.Stdout = &stdout
 			command.Stderr = &stderr
