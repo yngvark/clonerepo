@@ -1,6 +1,6 @@
 # Gclone
 
-Gclone removes the hazzle of having to use `cd` to the preferred directory when cloning and creating repositories.
+Gclone removes the hazzle of having to use `cd` to the preferred directory when cloning and creating repositories from GitHub.
 
 It consists of two commands:
 

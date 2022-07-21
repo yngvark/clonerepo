@@ -12,7 +12,6 @@ test: install-richgo ## -
 		./...
 
 build: $(SOURCES) ## -
-	echo sources: $(SOURCES)
 	mkdir -p ./build
 	go build -o ./build/gclone
 

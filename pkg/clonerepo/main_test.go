@@ -23,17 +23,22 @@ func TestCloneRepo(t *testing.T) {
 	build_executable.Run(t)
 
 	testCases := []struct {
-		name string
-		args []string
-		// cmd    string
+		name        string
+		args        []string
+		expectError bool
 	}{
 		{
 			name: "Should show help if there are zero args",
 			args: []string{},
 		},
 		{
+			name:        "Should return error if git URI is invalid",
+			args:        []string{"git@github.com-someorg-somerepo.git"},
+			expectError: true,
+		},
+		{
 			name: "Should clone repository to directory as specified by environment variable",
-			args: []string{"git@github.com:yngvark/some-repo.git"},
+			args: []string{"git@github.com:someorg/some-repo.git"},
 		},
 	}
 
@@ -59,7 +64,17 @@ func TestCloneRepo(t *testing.T) {
 			command.Stderr = &stderr
 
 			err = command.Run()
-			assert.NoError(t, err)
+
+			t.Log("PROGRAM OUTPUT:")
+			t.Log("-------------------------------------------------")
+			t.Log(stdout.String())
+			t.Log("-------------------------------------------------")
+
+			if tc.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err, stderr.String())
+			}
 
 			doGoldieAssert(t, stdout)
 		})
