@@ -18,13 +18,13 @@ jobs:
   Formatting:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Install Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       - uses: actions/cache@v3
         with:
@@ -38,13 +38,13 @@ jobs:
   Lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Install Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
@@ -56,13 +56,13 @@ jobs:
   Test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Install Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.16
-
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       - uses: actions/cache@v3
         with:
