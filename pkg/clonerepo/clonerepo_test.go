@@ -8,7 +8,7 @@ import (
 
 	"github.com/yngvark.com/gclone/pkg/testhelper/build"
 	"github.com/yngvark.com/gclone/pkg/testhelper/execute"
-	"github.com/yngvark.com/gclone/pkg/testhelper/storage"
+	"github.com/yngvark.com/gclone/pkg/testhelper/store"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -35,14 +35,14 @@ func TestCloneRepo(t *testing.T) {
 			t.Parallel()
 			var err error
 
-			store, err := storage.NewTemporaryStorage()
+			storage, err := store.NewTemporaryStorage()
 			assert.NoError(t, err)
 
 			var stdout, stderr bytes.Buffer
 			command := execute.CloneRepo("git@github.com:yngvark/some-repo.git")
 
 			command.Env = []string{
-				"GCLONE_GIT_DIR=" + store.BasePath,
+				"GCLONE_GIT_DIR=" + storage.BasePath,
 				"INTERNAL__CLONE_TEST_REPO=true",
 				fmt.Sprintf("PATH=%s:%s", build.ProjectBuildDir(), os.Getenv("PATH")),
 			}

@@ -1,5 +1,5 @@
 // Package storage can store temporary stuff.
-package storage
+package store
 
 import (
 	"io/ioutil"
