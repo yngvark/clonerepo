@@ -1,19 +1,21 @@
-package test_test
+package clonerepo_test
 
 import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"testing"
 
+	"github.com/yngvark.com/gclone/pkg/testhelper/build"
+	"github.com/yngvark.com/gclone/pkg/testhelper/execute"
+	"github.com/yngvark.com/gclone/pkg/testhelper/storage"
+
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/yngvark.com/gclone/test/storage"
 )
 
-func TestSayHello(t *testing.T) {
+func TestCloneRepo(t *testing.T) {
 	t.Parallel()
+	build.Run(t)
 
 	testCases := []struct {
 		name   string
@@ -36,16 +38,13 @@ func TestSayHello(t *testing.T) {
 			store, err := storage.NewTemporaryStorage()
 			assert.NoError(t, err)
 
-			build(t)
-
 			var stdout, stderr bytes.Buffer
-			command := exec.Command(
-				"../clonerepo", "git@github.com:yngvark/some-repo.git")
+			command := execute.CloneRepo("git@github.com:yngvark/some-repo.git")
 
 			command.Env = []string{
 				"GCLONE_GIT_DIR=" + store.BasePath,
 				"INTERNAL__CLONE_TEST_REPO=true",
-				fmt.Sprintf("PATH=../build:%s", os.Getenv("PATH")),
+				fmt.Sprintf("PATH=%s:%s", build.ProjectBuildDir(), os.Getenv("PATH")),
 			}
 			command.Stdout = &stdout
 			command.Stderr = &stderr
@@ -57,28 +56,4 @@ func TestSayHello(t *testing.T) {
 			t.Log("Test stderr: " + stderr.String())
 		})
 	}
-}
-
-func build(t *testing.T) {
-	t.Helper()
-
-	var err error
-
-	t.Log("Building")
-
-	var stdout, stderr bytes.Buffer
-
-	command := exec.Command("make", "-C", "..", "build")
-	command.Stdout = &stdout
-	command.Stderr = &stderr
-
-	err = command.Run()
-	if err != nil {
-		t.Log("Build stdout: " + stdout.String())
-		t.Log("Build stderr: " + stderr.String())
-	}
-
-	require.NoError(t, err)
-
-	t.Log("Building done")
 }
