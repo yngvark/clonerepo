@@ -1,4 +1,4 @@
-// Package storage can store temporary stuff.
+// Package store can store temporary stuff.
 package store
 
 import (

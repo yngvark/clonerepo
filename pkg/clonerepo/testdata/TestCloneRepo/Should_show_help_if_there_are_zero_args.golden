@@ -1,0 +1,10 @@
+`clonerepo` clones git repositores into a pre-determined directory structure, and then `cd`s into the cloned directory.
+
+Usage:
+  gclone clonerepo [flags]
+
+Flags:
+  -h, --help   help for clonerepo
+
+Global Flags:
+  -p, --print-output-dir string   Use 'sh' to print a cd command to change to the resulting directory, or 'fish' to print the resulting directory

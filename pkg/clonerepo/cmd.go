@@ -16,6 +16,10 @@ func BuildCommand(flags lib.Flags) *cobra.Command {
 		Short:        cmdShort,
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			return cloneRepo(flags, os.Stdout, args)
 		},
 	}
