@@ -1,4 +1,6 @@
 .PHONY: help
+SHELL = bash
+SOURCES := $(shell find ./cmd ./pkg -name "*.go")
 
 help: ## Print this menu
 	@grep -E '^[a-zA-Z_0-9-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -9,7 +11,8 @@ test: install-richgo ## -
 		-timeout 10m \
 		./...
 
-build: cmd pkg ## -
+build: $(SOURCES) ## -
+	echo sources: $(SOURCES)
 	mkdir -p ./build
 	go build -o ./build/gclone
 
