@@ -13,7 +13,7 @@ test: install-richgo ## -
 
 build: $(SOURCES) ## -
 	mkdir -p ./build
-	go build -o ./build/gclone
+	go build -o ./build/clonerepo
 
 run: ## -
 	go run ./...

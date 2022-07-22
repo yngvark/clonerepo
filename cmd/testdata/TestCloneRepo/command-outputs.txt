@@ -1,3 +1,5 @@
+clonerepo:
+
 Cloning into directory: /home/myself/some-git-dir/someuser/somerepo
 Cloning into 'somerepo'... (actually we are not, this is just fake output because you used the test flag)
 remote: Enumerating objects: 26, done.
@@ -5,3 +7,8 @@ remote: Counting objects: 100% (26/26), done.
 remote: Compressing objects: 100% (22/22), done.
 remote: Total 26 (delta 0), reused 26 (delta 0), pack-reused 0
 Receiving objects: 100% (26/26), 9.98 KiB | 9.98 MiB/s, done.
+
+
+clonerepo, when git repo already exists:
+
+Running git pull existing directory: /home/myself/some-git-dir/someuser/somerepo

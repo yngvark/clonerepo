@@ -86,6 +86,6 @@ In Fish shell, `.` and `source` do not work. To support Fish, you can install [f
 You can then use `fs` as you would `.` or `source`, like this:
 
 ```
-fs clonerepo https://github.com/yngvark/gclone.git
+fs clonerepo https://github.com/yngvark/clonerepo.git
 ```
 

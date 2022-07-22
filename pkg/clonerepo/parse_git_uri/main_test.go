@@ -1,6 +1,7 @@
-package parse_git_uri
+package parse_git_uri_test
 
 import (
+	"github.com/yngvark.com/clonerepo/pkg/clonerepo/parse_git_uri"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,11 +20,11 @@ func TestGitUriParserErrors(t *testing.T) {
 			expectError: false,
 		},
 		{
-			gitUri:      "https://github.com/yngvark/gclone.git",
+			gitUri:      "https://github.com/someone/somerepo.git",
 			expectError: false,
 		},
 		{
-			gitUri:      "https://github.com/someone/somerepo",
+			gitUri:      "https://github.com/someone/somerepo", // Missing ".git" at the end
 			expectError: true,
 		},
 		{
@@ -48,7 +49,7 @@ func TestGitUriParserErrors(t *testing.T) {
 		t.Run(tc.gitUri, func(t *testing.T) {
 			t.Parallel()
 
-			_, _, err := GetOrgAndRepoFromGitUri(tc.gitUri)
+			_, _, err := parse_git_uri.GetOrgAndRepoFromGitUri(tc.gitUri)
 
 			if tc.expectError {
 				assert.Error(t, err)
@@ -93,7 +94,7 @@ func TestGitUriParser(t *testing.T) {
 			t.Parallel()
 
 			// When
-			org, repo, err := GetOrgAndRepoFromGitUri(tc.gitUri)
+			org, repo, err := parse_git_uri.GetOrgAndRepoFromGitUri(tc.gitUri)
 			require.NoError(t, err)
 
 			// Then
