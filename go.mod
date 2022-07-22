@@ -3,6 +3,7 @@ module github.com/yngvark.com/gclone
 go 1.18
 
 require (
+	github.com/joho/godotenv v1.4.0
 	github.com/sebdah/goldie/v2 v2.5.3
 	github.com/spf13/afero v1.1.2
 	github.com/stretchr/testify v1.8.0
