@@ -7,7 +7,7 @@ import (
 	"github.com/yngvark.com/clonerepo/pkg/lib"
 )
 
-const cmdShort = "`clonerepo` clones git repositores into a pre-determined directory structure, and then `cd`s into" +
+const cmdShort = "clonerepo clones git repositores into a pre-determined directory structure, and then `cd`s into" +
 	" the cloned directory."
 
 func BuildCommand(flags lib.Flags) *cobra.Command {
