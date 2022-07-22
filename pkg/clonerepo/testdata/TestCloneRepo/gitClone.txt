@@ -5,4 +5,3 @@ remote: Counting objects: 100% (26/26), done.
 remote: Compressing objects: 100% (22/22), done.
 remote: Total 26 (delta 0), reused 26 (delta 0), pack-reused 0
 Receiving objects: 100% (26/26), 9.98 KiB | 9.98 MiB/s, done.
-
