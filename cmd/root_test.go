@@ -25,7 +25,7 @@ func TestCloneRepo(t *testing.T) {
 		},
 		{
 			name:        "Should return error if git URI is invalid",
-			args:        []string{"git@github.com-someorg-somerepo.git"},
+			args:        []string{"git@github.com:someorg-somerepo.git"}, // Correct is git@github.com:someorg/somerepo.git
 			expectError: true,
 		},
 		{
@@ -55,14 +55,14 @@ func TestCloneRepo(t *testing.T) {
 
 			var stdout, stderr bytes.Buffer
 
-			c := cmd.BuildCommand(cmd.Opts{
+			command := cmd.BuildCommand(cmd.Opts{
 				Out: &stdout,
 				Err: &stderr,
 			})
-			c.SetArgs(tc.args)
+			command.SetArgs(tc.args)
 
 			// When
-			err = c.Execute()
+			err = command.Execute()
 
 			t.Log("PROGRAM OUTPUT:")
 			t.Log("-------------------------------------------------")
