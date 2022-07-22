@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//nolint:funlen
 func TestCloneRepo(t *testing.T) {
 	t.Parallel()
 	build_executable.Run(t)
@@ -37,8 +38,8 @@ func TestCloneRepo(t *testing.T) {
 			expectError: true,
 		},
 		{
-			name: "Should clone repository to directory as specified by environment variable",
-			args: []string{"git@github.com:someorg/some-repo.git"},
+			name: "Should clone repository to expected directory",
+			args: []string{"git@github.com:some-org/some-1repo.git"},
 		},
 	}
 
@@ -46,6 +47,7 @@ func TestCloneRepo(t *testing.T) {
 		tc := tc //nolint:varnamelen
 
 		t.Run(tc.name, func(t *testing.T) {
+			// Given
 			t.Parallel()
 			var err error
 
@@ -57,12 +59,13 @@ func TestCloneRepo(t *testing.T) {
 
 			command.Env = []string{
 				fmt.Sprintf("%s=%s", clonerepo.ENV_GCLONE_GIT_DIR, storage.BasePath),
-				"INTERNAL__CLONE_TEST_REPO=true",
+				//"INTERNAL__CLONE_TEST_REPO=true",
 				fmt.Sprintf("PATH=%s:%s", build_executable.ProjectBuildDir(), os.Getenv("PATH")),
 			}
 			command.Stdout = &stdout
 			command.Stderr = &stderr
 
+			// When
 			err = command.Run()
 
 			t.Log("PROGRAM OUTPUT:")
@@ -70,26 +73,36 @@ func TestCloneRepo(t *testing.T) {
 			t.Log(stdout.String())
 			t.Log("-------------------------------------------------")
 
+			// Then
 			if tc.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err, stderr.String())
 			}
 
-			doGoldieAssert(t, stdout)
+			doGoldieAssert(t, stdout, stderr)
 		})
 	}
 }
 
-func doGoldieAssert(t *testing.T, buffer bytes.Buffer) {
+func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
 	t.Helper()
 
 	goldie := goldiePkg.New(t)
 	t.Log(t.Name())
 
 	// Remove apostrophes, so we don't break importing our code as a library
-	goldieFilename := strings.ReplaceAll(t.Name(), "'", "")
+	goldieFilenameBase := strings.ReplaceAll(t.Name(), "'", "")
 
-	// goldie.Update(t, goldieFilename, buffer.Bytes())
-	goldie.Assert(t, goldieFilename, buffer.Bytes())
+	goldieFilenameStdout := goldieFilenameBase + "-stdout"
+	goldieFilenameStderr := goldieFilenameBase + "-stderr"
+
+	if len(stdout.Bytes()) > 0 {
+		//goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
+		goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
+	}
+	if len(stderr.Bytes()) > 0 {
+		//goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
+		goldie.Assert(t, goldieFilenameStderr, stderr.Bytes())
+	}
 }
