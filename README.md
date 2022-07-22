@@ -1,18 +1,17 @@
-# Gclone
+# Clonerepo
 
-Gclone removes the hazzle of having to use `cd` to the preferred directory when cloning and creating repositories from GitHub.
+`clonerepo` removes the hazzle of having to use `cd` to the preferred directory when cloning from GitHub.
 
-It consists of two commands:
+It clones github repositores into a pre-determined directory structure, and then `cd`s into the cloned directory.
 
-* `clonerepo` clones git repositores into a pre-determined directory structure, and then `cd`s into the cloned directory.
-* `newrepo` creates git repositories into a pre-determined directory structure, and then `cd`s into the directory containing the repository.
+:information_source: Tip: See also  [`newrepo`](https://github.com/yngvark/newrepo.git).  It creates git repositories into a pre-determined directory structure, and then `cd`s intog the directory containing the repository.
 
-**Example: clonerepo**
+**Example**
 
 ```sh
-/tmp $ . clonerepo https://github.com/yngvark/gclone.git
-Cloning into directory: /home/myself/git/yngvark/gclone
-Cloning into 'gclone'...
+/tmp $ . clonerepo https://github.com/yngvark/newrepo.git
+Cloning into directory: /home/myself/git/yngvark/newrepo
+Cloning into 'newrepo'...
 remote: Enumerating objects: 26, done.
 remote: Counting objects: 100% (26/26), done.
 remote: Compressing objects: 100% (20/20), done.
@@ -20,58 +19,54 @@ remote: Total 26 (delta 7), reused 23 (delta 4), pack-reused 0
 Receiving objects: 100% (26/26), 9.02 KiB | 9.02 MiB/s, done.
 Resolving deltas: 100% (7/7), done.
 
-~/git/gclone (main) $ 
+~/git/newrepo (main) $ 
 ```
 
 Notice that `clonerepo` changed the current directory (where the parent path is configurable).
 
-**Example: newrepo**
-
-```sh
-/tmp $ . newrepo my-new-repo
-Command: gh repo create --clone my-github-username/my-new-repo --public
-Successfully created public repository in directory /home/myself/git/my-github-username/my-new-repo
-cd /home/myself/git/my-github-username/my-new-repo
-```
-
-Notice that `newrepo` changed the current directory to the new repository's directory (where the parent path is configurable).
-
 ## Install
 
 ```sh
-cd wherever-you-put-your-applications-or-repos
-git clone https://github.com/yngvark/gclone.git
-mkdir -p ~/.local/bin # Make sure this is in your PATH
-ln -s $(pwd)/gclone/clonerepo ~/.local/bin/clonerepo
-ln -s $(pwd)/gclone/newrepo ~/.local/bin/newrepo
+go install https://github.com/yngvark/clonerepo
 ```
 
-In your .bashrc/.zshrc, or wherever you want your environment variables to live, add:
+## Getting started
+
+* Install `clonerepo` as shown above.
+
+* We need to tell `clonerepo` where it should store repositories.
 
 ```sh
-export GCLONE_GIT_DIR=/home/myself/git
-export GCLONE_GIT_TEMP_DIR="/tmp/git"
-export REPONEW_DEFAULT_ORGANIZATION="my-git-username"
+clonerepo config gitDir=$HOME/git # Replace directory with your preference
 ```
 
-ToDo: Put this into config file or something instead.
+* Now, try cloning a directory:
 
-### Uninstall
+Bash/Zsh:
+
+```bash
+. clonerepo https://github.com/yngvark/clonerepo
+```
+
+Fish (this requires [fish-source](#fish-shell-support):
+
+```fish
+fs clonerepo https://github.com/yngvark/clonerepo
+```
+
+* Notice how the current directory changed to `$HOME/git` - or whatever you set your `gitDir` to in the configuration above.
+
+## Uninstall
 
 ```sh
-cd wherever-you-put-your-applications-or-repos
-rm -rf gclone
-rm ~/.local/bin/clonerepo
-rm ~/.local/bin/newrepo
+rm $GOBIN/clonerepo
 ```
 
 ## Usage
 
-### Clone repositories
-
 ```sh
 $ clonerepo -h
-usage: gclone_repo [-h] [-t] repoUri
+usage: clonerepo [-h] [-t] repoUri
 
 git clones a repo URI to the appropriate directory. Tip: use ". clonerepo <args>"
 to change directory to cloned directory.
@@ -84,38 +79,11 @@ optional arguments:
   -t, --temp  Clone the repository in a temporary directory
 ```
 
-### Create repositories
-
-Requirements:
-* [gh](https://cli.github.com/)
-
-```sh
-$ newrepo -h
-usage: gclone_reponew [-h] [-n | --dry-run | --no-dry-run] [-p | --private | --no-private] [-t TEMPLATE] [-d DESCRIPTION] repoId
-
-Creates a new Github repository. Tip: use ". newrepo <args>"
-to change directory to cloned directory.
-
-positional arguments:
-  repoId                Organization (optinal) and repository name. Example: myorg/myrepo
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -n, --dry-run, --no-dry-run
-                        Don't make any changes
-  -p, --private, --no-private
-                        Make the new repository private
-  -t TEMPLATE, --template TEMPLATE
-                        repository for template. For instance 'myorg/mytemplaterepo'
-  -d DESCRIPTION, --description DESCRIPTION
-                        the description for the repository
-```
-
 ### Fish shell support
 
-In Fish shell, `.` and `source` don't work. To support Fish, you can install [fs](https://github.com/yngvark/fs).
+In Fish shell, `.` and `source` do not work. To support Fish, you can install [fish-source](https://github.com/yngvark/fish-source).
 
-You can then replace `.` in the above commands with `fs`, for instance
+You can then use `fs` as you would `.` or `source`, like this:
 
 ```
 fs clonerepo https://github.com/yngvark/gclone.git

@@ -2,7 +2,6 @@ package cmd_test
 
 /*
 import (
-	"github.com/yngvark.com/gclone/cmd"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"path"
 
-	"github.com/yngvark.com/gclone/pkg/testhelper/build_executable"
+	"github.com/yngvark.com/clonerepo/pkg/testhelper/build_executable"
 )
 
 // CloneRepo runs the clonerepo command.

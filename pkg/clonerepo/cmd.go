@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/yngvark.com/gclone/pkg/lib"
+	"github.com/yngvark.com/clonerepo/pkg/lib"
 )
 
 const cmdShort = "`clonerepo` clones git repositores into a pre-determined directory structure, and then `cd`s into" +

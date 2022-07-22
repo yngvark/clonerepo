@@ -8,12 +8,12 @@ import (
 	"testing"
 
 	goldiePkg "github.com/sebdah/goldie/v2"
-	"github.com/yngvark.com/gclone/pkg/clonerepo"
+	"github.com/yngvark.com/clonerepo/pkg/clonerepo"
 
-	"github.com/yngvark.com/gclone/pkg/testhelper/build_executable"
+	"github.com/yngvark.com/clonerepo/pkg/testhelper/build_executable"
 
-	"github.com/yngvark.com/gclone/pkg/testhelper/execute"
-	"github.com/yngvark.com/gclone/pkg/testhelper/store"
+	"github.com/yngvark.com/clonerepo/pkg/testhelper/execute"
+	"github.com/yngvark.com/clonerepo/pkg/testhelper/store"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -1,4 +1,4 @@
-module github.com/yngvark.com/gclone
+module github.com/yngvark.com/clonerepo
 
 go 1.18
 

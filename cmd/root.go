@@ -3,9 +3,9 @@ package cmd
 import (
 	"os"
 
-	"github.com/yngvark.com/gclone/pkg/lib"
+	"github.com/yngvark.com/clonerepo/pkg/lib"
 
-	"github.com/yngvark.com/gclone/pkg/clonerepo"
+	"github.com/yngvark.com/clonerepo/pkg/clonerepo"
 
 	"github.com/spf13/cobra"
 )

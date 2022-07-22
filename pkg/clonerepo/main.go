@@ -7,8 +7,8 @@ import (
 	"path"
 
 	"github.com/joho/godotenv"
-	"github.com/yngvark.com/gclone/pkg/clonerepo/parse_git_uri"
-	"github.com/yngvark.com/gclone/pkg/lib"
+	"github.com/yngvark.com/clonerepo/pkg/clonerepo/parse_git_uri"
+	"github.com/yngvark.com/clonerepo/pkg/lib"
 )
 
 //goland:noinspection GoSnakeCaseUsage
