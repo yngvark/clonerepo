@@ -73,6 +73,12 @@ func TestGitUriParser(t *testing.T) {
 			expectRepo: "somerepo",
 		},
 		{
+			name:       "Should get correct org and repo from git native URI",
+			gitUri:     "git@github.com:some-org/some-repo.git",
+			expectOrg:  "some-org",
+			expectRepo: "some-repo",
+		},
+		{
 			name:       "Should get correct org and repo from HTTPS git URI",
 			gitUri:     "https://github.com/someorg/somerepo.git",
 			expectOrg:  "someorg",
@@ -81,13 +87,16 @@ func TestGitUriParser(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
+		tc := tc //nolint:varnamelen
+
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
+			// When
 			org, repo, err := GetOrgAndRepoFromGitUri(tc.gitUri)
 			require.NoError(t, err)
 
+			// Then
 			assert.Equal(t, tc.expectOrg, org)
 			assert.Equal(t, tc.expectRepo, repo)
 		})

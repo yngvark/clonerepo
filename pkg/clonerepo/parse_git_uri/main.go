@@ -18,7 +18,7 @@ var ErrInvalidGitUri = errors.New("not a valid or supported git URI")
 //
 // someorg, somerepo
 func GetOrgAndRepoFromGitUri(gitUri string) (string, string, error) {
-	re := regexp.MustCompile(`(git@github.com:|https://github.com/)(\w+)/(\w+)(\.git)?`)
+	re := regexp.MustCompile(`(git@github.com:|https://github.com/)([\w-]+)/([\w-]+)(\.git)?`)
 
 	match := re.FindStringSubmatch(gitUri)
 	if match == nil {

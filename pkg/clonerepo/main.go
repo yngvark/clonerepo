@@ -3,7 +3,10 @@ package clonerepo
 import (
 	"fmt"
 	"io"
+	"os"
+	"path"
 
+	"github.com/joho/godotenv"
 	"github.com/yngvark.com/gclone/pkg/clonerepo/parse_git_uri"
 	"github.com/yngvark.com/gclone/pkg/lib"
 )
@@ -14,24 +17,23 @@ const (
 )
 
 func cloneRepo(flags lib.Flags, out io.Writer, args []string) error {
-	org, repoDir, err := parse_git_uri.GetOrgAndRepoFromGitUri(args[0])
+	err := godotenv.Load()
+	if err != nil {
+		return fmt.Errorf("loading .env file: %w", err)
+	}
+
+	envGcloneGitDir, ok := os.LookupEnv(ENV_GCLONE_GIT_DIR)
+	if !ok {
+		return fmt.Errorf("missing environment variable: %s", ENV_GCLONE_GIT_DIR)
+	}
+
+	org, repo, err := parse_git_uri.GetOrgAndRepoFromGitUri(args[0])
 	if err != nil {
 		return fmt.Errorf("parsing git organization and repository: %w", err)
 	}
 
-	_, _ = fmt.Fprintf(out, "Org: %s - Repo: %s", org, repoDir)
+	gitRepoDir := path.Join(envGcloneGitDir, org, repo)
+	_, _ = fmt.Fprintf(out, "%s\n", gitRepoDir)
 
 	return nil
 }
-
-/*
-err := godotenv.Load() //nolint:ifshort
-if err != nil {
-	return fmt.Errorf("loading .env file: %w", err)
-}
-
-envGcloneGitDir, ok := os.LookupEnv(ENV_GCLONE_GIT_DIR)
-if !ok {
-	return fmt.Errorf("missing environment variable: %s", ENV_GCLONE_GIT_DIR)
-}
-*/
