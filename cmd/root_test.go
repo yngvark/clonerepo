@@ -2,7 +2,10 @@ package cmd_test
 
 import (
 	"bytes"
+	"github.com/spf13/afero"
+	"github.com/stretchr/testify/require"
 	"github.com/yngvark.com/clonerepo/cmd"
+	"io/ioutil"
 	"strings"
 	"testing"
 
@@ -10,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//nolint:funlen
 func TestCloneRepo(t *testing.T) {
 	t.Parallel()
 
@@ -18,6 +20,7 @@ func TestCloneRepo(t *testing.T) {
 		name        string
 		args        []string
 		expectError bool
+		asserts     func(t *testing.T, opts testOpts)
 	}{
 		{
 			name: "Should show help if there are zero args",
@@ -29,8 +32,25 @@ func TestCloneRepo(t *testing.T) {
 			expectError: true,
 		},
 		{
+			name: "Should write initial configuration if it's missing",
+			args: []string{"git@github.com:some-org/some-repo.git"},
+			asserts: func(t *testing.T, opts testOpts) {
+				t.Helper()
+
+				configFilename := "TODO"
+				configFile, err := opts.cmdOpts.FileSystem.Open(configFilename)
+				require.NoError(t, err)
+
+				configFileContents, err := ioutil.ReadAll(configFile)
+				require.NoError(t, err)
+
+				goldie := goldiePkg.New(t)
+				goldie.Assert(t, t.Name(), configFileContents)
+			},
+		},
+		{
 			name: "Should clone repository to expected directory",
-			args: []string{"git@github.com:some-org/some-1repo.git"},
+			args: []string{"git@github.com:some-org/some-repo.git"},
 		},
 	}
 
@@ -41,6 +61,7 @@ func TestCloneRepo(t *testing.T) {
 			// Given
 			t.Parallel()
 			var err error
+			opts := testOpts{}
 
 			/*
 				storage, err := store.NewTemporaryStorage()
@@ -55,10 +76,14 @@ func TestCloneRepo(t *testing.T) {
 
 			var stdout, stderr bytes.Buffer
 
-			command := cmd.BuildCommand(cmd.Opts{
-				Out: &stdout,
-				Err: &stderr,
-			})
+			cmdOpts := cmd.Opts{
+				Out:        &stdout,
+				Err:        &stderr,
+				FileSystem: afero.NewMemMapFs(),
+			}
+			opts.cmdOpts = cmdOpts
+
+			command := cmd.BuildRootCommand(cmdOpts)
 			command.SetArgs(tc.args)
 
 			// When
@@ -77,6 +102,10 @@ func TestCloneRepo(t *testing.T) {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err, stderr.String())
+			}
+
+			if tc.asserts != nil {
+				tc.asserts(t, opts)
 			}
 
 			doGoldieAssert(t, stdout, stderr)
@@ -107,73 +136,6 @@ func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
 	}
 }
 
-/*
-//nolint:funlen
-func TestCloneRepo(t *testing.T) {
-	t.Parallel()
-	build_executable.Run(t)
-
-	testCases := []struct {
-		name        string
-		args        []string
-		expectError bool
-	}{
-		{
-			name: "Should show help if there are zero args",
-			args: []string{},
-		},
-		{
-			name:        "Should return error if git URI is invalid",
-			args:        []string{"git@github.com-someorg-somerepo.git"},
-			expectError: true,
-		},
-		{
-			name: "Should clone repository to expected directory",
-			args: []string{"git@github.com:some-org/some-1repo.git"},
-		},
-	}
-
-	for _, tc := range testCases {
-		tc := tc //nolint:varnamelen
-
-		t.Run(tc.name, func(t *testing.T) {
-			// Given
-			t.Parallel()
-			var err error
-
-			storage, err := store.NewTemporaryStorage()
-			assert.NoError(t, err)
-
-			var stdout, stderr bytes.Buffer
-			command := execute.CloneRepo(tc.args...)
-
-			command.Env = []string{
-				fmt.Sprintf("%s=%s", clonerepo.ENV_GCLONE_GIT_DIR, storage.BasePath),
-				//"INTERNAL__CLONE_TEST_REPO=true",
-				fmt.Sprintf("PATH=%s:%s", build_executable.ProjectBuildDir(), os.Getenv("PATH")),
-			}
-			command.Stdout = &stdout
-			command.Stderr = &stderr
-
-			// When
-			err = command.Run()
-
-			t.Log("PROGRAM OUTPUT:")
-			t.Log("-------------------------------------------------")
-			t.Log(stdout.String())
-			t.Log("-------------------------------------------------")
-
-			// Then
-			if tc.expectError {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err, stderr.String())
-			}
-
-			doGoldieAssert(t, stdout, stderr)
-		})
-	}
+type testOpts struct {
+	cmdOpts cmd.Opts
 }
-
-
-*/

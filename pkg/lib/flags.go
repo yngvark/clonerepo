@@ -3,4 +3,5 @@ package lib
 
 type Flags struct {
 	PrintOutputDirFlag string
+	ConfigFile         string
 }
