@@ -18,11 +18,11 @@ linters:
         - unparam # Deprecated
         - wastedassign # Deprecated
         - wrapcheck # Deprecated
-        - forbidigo # Complains on using fmt.Println
-        - revive # Complains on underscores in package names
-        - stylecheck # Complains on underscores in package names
-        - exhaustruct # Complains about unused struct fields, that doesn't make any sense
-        - gci # It's just gets in the way too often with hard-to-understand messages
+        - forbidigo # Complains on using fmt.Println.
+        - revive # Complains on underscores in package names.
+        - stylecheck # Complains on underscores in package names.
+        - exhaustruct # Complains about unused struct fields, that doesn't make any sense.
+        - gci # It's just gets in the way too often with hard-to-understand messages.
 linters-settings:
     gci: # This is a workaround that should be removed, see
         # https://github.com/golangci/golangci-lint/issues/1490#issuecomment-1186947213
@@ -31,3 +31,13 @@ linters-settings:
             - standard
             - default
             - prefix(github.com/yngvark.com/gclone)
+    varnamelen:
+        ignore-names:
+            - tc # test case (used in unit tests)
+            - fs # file system
+
+issues:
+    exclude-rules:
+        - path: _test.go
+          linters:
+              - funlen # Long test functions are usually because lots of test cases, thus shouldn't give a warning.
