@@ -1,8 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"os"
+
+	"github.com/spf13/viper"
+	"github.com/yngvark.com/clonerepo/pkg/lib/log"
 
 	"github.com/spf13/afero"
 	"github.com/yngvark.com/clonerepo/pkg/lib/config"
@@ -42,19 +46,28 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		Short:        cmdShort,
 		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			o := config.Opts{
-				Out: opts.Out,
-				Fs:  afero.NewOsFs(),
+			configOpts := config.Opts{
+				Fs: afero.NewOsFs(),
 			}
 
-			return config.Init(o, flags.ConfigFile)
+			err := config.Init(configOpts, flags.ConfigFile)
+			if err != nil {
+				return fmt.Errorf("initializing config: %w", err)
+			}
+
+			logger := log.New(opts.Out, flags.Debug)
+			logger.Debugln("Using config file:", viper.ConfigFileUsed())
+
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			logger := log.New(opts.Out, flags.Debug)
+
 			if len(args) == 0 {
 				return cmd.Help()
 			}
 
-			return clonerepo.Run(opts.Out, args)
+			return clonerepo.Run(logger, args)
 		},
 	}
 
@@ -75,6 +88,13 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		"",
 		"Use 'sh' to print a cd command to change to the resulting directory, or 'fish' "+
 			"to print the resulting directory")
+
+	cmd.PersistentFlags().BoolVarP(
+		&flags.Debug,
+		"debug",
+		"d",
+		false,
+		"Enables debug output")
 
 	return cmd
 }

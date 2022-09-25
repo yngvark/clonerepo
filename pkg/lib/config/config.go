@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -11,8 +10,7 @@ import (
 )
 
 type Opts struct {
-	Out io.Writer
-	Fs  afero.Fs
+	Fs afero.Fs
 }
 
 // Init initializes the program's configuration.
@@ -46,12 +44,10 @@ func Init(initOpts Opts, cfgFilepath string) error {
 	viper.AutomaticEnv()
 
 	err = viper.ReadInConfig()
-	if err == nil {
-		fmt.Fprintln(initOpts.Out, "Using config file:", viper.ConfigFileUsed())
-	} else {
+	if err != nil {
 		err2 := viper.WriteConfig()
 		if err2 != nil {
-			return fmt.Errorf("!!!!!!!!!!!!! writing config: %w", err)
+			return fmt.Errorf("writing config: %w", err)
 		}
 	}
 
@@ -60,5 +56,7 @@ func Init(initOpts Opts, cfgFilepath string) error {
 
 func createMissingParentDirectories(cfgFilepath string) error {
 	dir := filepath.Dir(cfgFilepath)
+
+	// nolint:gomnd
 	return os.MkdirAll(dir, 0o700)
 }
