@@ -41,8 +41,6 @@ func Init(initOpts Opts, cfgFilepath string) error {
 	viper.SetConfigFile(cfgFilepath)
 	viper.SetConfigType("yaml")
 
-	viper.AutomaticEnv()
-
 	err = viper.ReadInConfig()
 	if err != nil {
 		err2 := viper.WriteConfig()
