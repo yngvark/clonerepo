@@ -25,8 +25,8 @@ func TestGitUriParserErrors(t *testing.T) {
 			expectError: false,
 		},
 		{
-			gitUri:      "https://github.com/someone/somerepo", // Missing ".git" at the end
-			expectError: true,
+			gitUri:      "https://github.com/someone/somerepo", // No ".git" at the end, which is valid
+			expectError: false,
 		},
 		{
 			gitUri:      "somerepo",
@@ -45,6 +45,7 @@ func TestGitUriParserErrors(t *testing.T) {
 			expectError: true,
 		},
 	}
+
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.gitUri, func(t *testing.T) {
