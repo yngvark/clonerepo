@@ -26,7 +26,7 @@ func TestConfigDir(t *testing.T) {
 		expectedConfigFilePath string
 	}{
 		{
-			name: "Should return path of XDG_CONFIG_HOME when it's set",
+			name: "Should return path of XDG_CONFIG_HOME if it's set",
 			osLookupEnvFunc: func(key string) (string, bool) {
 				if key == "XDG_CONFIG_HOME" {
 					return xdgConfigHome, true
@@ -38,7 +38,7 @@ func TestConfigDir(t *testing.T) {
 				xdgConfigHome, config.Dir, config.FileNameWhenInConfigFolder),
 		},
 		{
-			name: "Should return config in $HOME/.config when it exists",
+			name: "Should return config in $HOME/.config if it exists",
 			fs: func() afero.Fs {
 				fs := afero.NewMemMapFs()
 
@@ -48,11 +48,13 @@ func TestConfigDir(t *testing.T) {
 
 				return fs
 			}(),
+			// Example: /home/bob/.config/clonerepo/config.yaml
 			expectedConfigFilePath: path.Join(
 				userHomeDir, ".config", config.Dir, config.FileNameWhenInConfigFolder),
 		},
 		{
-			name:                   "Should return config in $HOME in all other cases",
+			name: "Should return config in $HOME in all other cases",
+			// Example: /home/bob/.clonerepo.yaml
 			expectedConfigFilePath: path.Join(userHomeDir, config.FileNameWhenHomeDir),
 		},
 	}

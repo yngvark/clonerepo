@@ -6,11 +6,10 @@ import (
 	"path"
 
 	"github.com/yngvark.com/clonerepo/pkg/clonerepo/parse_git_uri"
-	"github.com/yngvark.com/clonerepo/pkg/lib"
 )
 
-func Run(flags lib.Flags, out io.Writer, args []string) error {
-	gitDir := "todo!"
+func Run(out io.Writer, args []string) error {
+	gitDir := "todo!" // TODO: Get from config
 
 	org, repo, err := parse_git_uri.GetOrgAndRepoFromGitUri(args[0])
 	if err != nil {
@@ -19,6 +18,10 @@ func Run(flags lib.Flags, out io.Writer, args []string) error {
 
 	gitRepoDir := path.Join(gitDir, org, repo)
 	_, _ = fmt.Fprintf(out, "%s\n", gitRepoDir)
+
+	// TODO:
+	// - If dir exists, pull it
+	// - Else clone it
 
 	return nil
 }

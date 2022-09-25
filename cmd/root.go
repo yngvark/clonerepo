@@ -54,7 +54,7 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 				return cmd.Help()
 			}
 
-			return clonerepo.Run(flags, opts.Out, args)
+			return clonerepo.Run(opts.Out, args)
 		},
 	}
 
