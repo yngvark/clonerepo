@@ -2,21 +2,17 @@ package config
 
 import (
 	"fmt"
+	"github.com/spf13/afero"
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 )
-
-type Opts struct {
-	Fs afero.Fs
-}
 
 // Init initializes the program's configuration.
 //
 // Inspired by: https://github.com/spf13/cobra/blob/main/user_guide.md#create-rootcmd
-func Init(initOpts Opts, cfgFilepath string) error {
+func Init(fs afero.Fs, cfgFilepath string) error {
 	var err error
 
 	opts := OsOpts{
@@ -25,7 +21,7 @@ func Init(initOpts Opts, cfgFilepath string) error {
 	}
 
 	if cfgFilepath == "" {
-		cfgFilepath, err = GetConfigFilePath(initOpts.Fs, opts)
+		cfgFilepath, err = GetConfigFilePath(fs, opts)
 		if err != nil {
 			return fmt.Errorf("getting config file path: %w", err)
 		}

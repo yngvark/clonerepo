@@ -18,13 +18,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const cmdShort = "clonerepo clones git repositores into a pre-determined directory structure, and then `cd`s into" +
-	" the cloned directory."
+const cmdShort = "clonerepo clones git repositores into a pre-determined directory structure, and " +
+	"then `cd`s into the cloned directory."
 
 func Run() {
 	cmd := BuildRootCommand(Opts{
-		Out: os.Stdout,
-		Err: os.Stderr,
+		Out:        os.Stdout,
+		Err:        os.Stderr,
+		FileSystem: afero.NewOsFs(),
 	})
 
 	if err := cmd.Execute(); err != nil {
@@ -32,13 +33,6 @@ func Run() {
 	}
 }
 
-type Opts struct {
-	Out        io.Writer
-	Err        io.Writer
-	FileSystem afero.Fs
-}
-
-// nolint:funlen
 func BuildRootCommand(opts Opts) *cobra.Command {
 	flags := lib.Flags{}
 
@@ -47,11 +41,7 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		Short:        cmdShort,
 		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			configOpts := config.Opts{
-				Fs: afero.NewOsFs(),
-			}
-
-			err := config.Init(configOpts, flags.ConfigFile)
+			err := config.Init(opts.FileSystem, flags.ConfigFile)
 			if err != nil {
 				return fmt.Errorf("initializing config: %w", err)
 			}
@@ -112,4 +102,10 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		"Enables verbose output")
 
 	return cmd
+}
+
+type Opts struct {
+	Out        io.Writer
+	Err        io.Writer
+	FileSystem afero.Fs
 }
