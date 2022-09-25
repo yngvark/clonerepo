@@ -2,12 +2,10 @@ package cmd_test
 
 import (
 	"bytes"
-	"io/ioutil"
 	"strings"
 	"testing"
 
 	"github.com/spf13/afero"
-	"github.com/stretchr/testify/require"
 	"github.com/yngvark.com/clonerepo/cmd"
 
 	goldiePkg "github.com/sebdah/goldie/v2"
@@ -33,22 +31,27 @@ func TestCloneRepo(t *testing.T) {
 			expectError: true,
 		},
 		{
-			name: "Should write initial configuration if it's missing",
-			args: []string{"git@github.com:some-org/some-repo.git"},
-			asserts: func(t *testing.T, opts testOpts) {
-				t.Helper()
-
-				configFilename := "TODO"
-				configFile, err := opts.cmdOpts.FileSystem.Open(configFilename)
-				require.NoError(t, err)
-
-				configFileContents, err := ioutil.ReadAll(configFile)
-				require.NoError(t, err)
-
-				goldie := goldiePkg.New(t)
-				goldie.Assert(t, t.Name(), configFileContents)
-			},
+			name:        "Should return error if config is missing",
+			args:        []string{"git@github.com:someorg/somerepo.git"},
+			expectError: true,
 		},
+		//{
+		//	name: "Should write initial configuration if it's missing",
+		//	args: []string{"--verbose", "git@github.com:some-org/some-repo.git"},
+		//	asserts: func(t *testing.T, opts testOpts) {
+		//		t.Helper()
+		//
+		//		configFilename := "TODO"
+		//		configFile, err := opts.cmdOpts.FileSystem.Open(configFilename)
+		//		require.NoError(t, err)
+		//
+		//		configFileContents, err := ioutil.ReadAll(configFile)
+		//		require.NoError(t, err)
+		//
+		//		goldie := goldiePkg.New(t)
+		//		goldie.Assert(t, t.Name(), configFileContents)
+		//	},
+		//},
 		{
 			name: "Should clone repository to expected directory",
 			args: []string{"git@github.com:some-org/some-repo.git"},
