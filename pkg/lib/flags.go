@@ -2,8 +2,8 @@
 package lib
 
 type Flags struct {
-	PrintOutputDirFlag bool
-	ConfigFile         string
-	DryRun             bool
-	Verbose            bool
+	CdToOutputDir bool
+	ConfigFile    string
+	DryRun        bool
+	Verbose       bool
 }

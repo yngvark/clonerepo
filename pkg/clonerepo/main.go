@@ -3,6 +3,7 @@ package clonerepo
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"path"
 
@@ -12,9 +13,9 @@ import (
 )
 
 type Opts struct {
-	Logger             *logrus.Logger
-	DryRun             bool
-	PrintOutputDirFlag bool
+	Logger        *logrus.Logger
+	DryRun        bool
+	CdToOutputDir bool
 }
 
 func Run(opts Opts, gitDir string, args []string) error {
@@ -22,34 +23,55 @@ func Run(opts Opts, gitDir string, args []string) error {
 
 	opts.Logger.Debugln("Git dir: " + gitDir)
 
-	org, _, err := parse_git_uri.GetOrgAndRepoFromGitUri(gitUri)
+	org, repo, err := parse_git_uri.GetOrgAndRepoFromGitUri(gitUri)
 	if err != nil {
 		return fmt.Errorf("parsing git organization and repository: %w", err)
 	}
 
-	// cloneDir := path.Join(gitDir, org, repo)
-	targetCloneDir := path.Join(gitDir, org)
+	dirToRunGitCloneIn := path.Join(gitDir, org)
 
-	// nolint: godox
-	// TODO:
-	// - If dir exists, pull it
-	// - Else clone it
+	clonedDir := path.Join(gitDir, org, repo)
 
-	err = gitClone(opts, gitUri, targetCloneDir)
+	cloneDirExists, err := dirExists(clonedDir)
 	if err != nil {
-		return fmt.Errorf("git cloning: %w", err)
+		return fmt.Errorf("checking if directory '%s' exists: %w", clonedDir, err)
 	}
 
-	if opts.PrintOutputDirFlag {
-		fmt.Println(targetCloneDir)
+	if !cloneDirExists {
+		err = gitClone(opts, gitUri, dirToRunGitCloneIn)
+		if err != nil {
+			return fmt.Errorf("running git clone: %w", err)
+		}
+	} else {
+		err = gitPull(opts, clonedDir)
+		if err != nil {
+			return fmt.Errorf("running git pull: %w", err)
+		}
+	}
+
+	if opts.CdToOutputDir {
+		fmt.Println("cd " + dirToRunGitCloneIn)
 	}
 
 	return nil
 }
 
+func dirExists(dir string) (bool, error) {
+	_, err := os.Stat(dir)
+	if err == nil {
+		return true, nil
+	}
+
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+
+	return false, err
+}
+
 func gitClone(opts Opts, gitUri string, targetCloneDir string) error {
 	if opts.DryRun {
-		opts.Logger.Infof("Skipping: git clone " + gitUri + " in " + targetCloneDir)
+		opts.Logger.Debugf("Skipping: git clone " + gitUri + " in " + targetCloneDir)
 
 		return nil
 	}
@@ -62,11 +84,40 @@ func gitClone(opts Opts, gitUri string, targetCloneDir string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		opts.Logger.Errorf("Error! Command '%s' in directory '%s' failed. "+
-			"Stderr:\n---\n%s---\n", cmd.String(), cmd.Dir, stderr.String())
+		logError(opts.Logger, cmd, stderr)
 
 		return fmt.Errorf("running command: %w", err)
 	}
 
 	return nil
+}
+
+func gitPull(opts Opts, gitCloneDir string) error {
+	if opts.DryRun {
+		opts.Logger.Debugf("Skipping: git pull in " + gitCloneDir)
+
+		return nil
+	}
+
+	opts.Logger.Debugf("Running git pull in " + gitCloneDir)
+
+	cmd := exec.Command("git", "pull")
+	cmd.Dir = gitCloneDir
+
+	stderr := new(bytes.Buffer)
+	cmd.Stderr = stderr
+
+	err := cmd.Run()
+	if err != nil {
+		logError(opts.Logger, cmd, stderr)
+
+		return fmt.Errorf("running command: %w", err)
+	}
+
+	return nil
+}
+
+func logError(logger *logrus.Logger, cmd *exec.Cmd, stderr *bytes.Buffer) {
+	logger.Errorf("Error! Command '%s' in directory '%s' failed. "+
+		"Stderr:\n---\n%s---\n", cmd.String(), cmd.Dir, stderr.String())
 }

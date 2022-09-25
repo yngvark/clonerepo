@@ -71,9 +71,9 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 			gitDir := viper.GetString("gitDir")
 
 			clonerepoOpts := clonerepo.Opts{
-				Logger:             logger,
-				DryRun:             flags.DryRun,
-				PrintOutputDirFlag: flags.PrintOutputDirFlag,
+				Logger:        logger,
+				DryRun:        flags.DryRun,
+				CdToOutputDir: flags.CdToOutputDir,
 			}
 
 			return clonerepo.Run(clonerepoOpts, gitDir, args)
@@ -91,11 +91,11 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 			"$HOME/.config/clonerepo/config.yaml. If not, it will be $HOME/.clonerepo.yaml)")
 
 	cmd.PersistentFlags().BoolVarP(
-		&flags.PrintOutputDirFlag,
-		"print-output-dir",
-		"p",
+		&flags.CdToOutputDir,
+		"cd-to-output-dir",
+		"o",
 		true,
-		"Prints the path of the cloned directory")
+		"Outputs 'cd <cloned dir>' to stdout, which can be used for sourcing in a shell script.")
 
 	cmd.PersistentFlags().BoolVarP(
 		&flags.DryRun,
