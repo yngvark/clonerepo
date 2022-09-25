@@ -102,14 +102,14 @@ func TestCloneRepo(t *testing.T) {
 			t.Log("-------------------------------------------------")
 
 			// Then
+			if tc.asserts != nil {
+				tc.asserts(t, opts)
+			}
+
 			if tc.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err, stderr.String())
-			}
-
-			if tc.asserts != nil {
-				tc.asserts(t, opts)
 			}
 
 			doGoldieAssert(t, stdout, stderr)
