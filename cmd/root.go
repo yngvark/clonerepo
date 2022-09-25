@@ -38,6 +38,7 @@ type Opts struct {
 	FileSystem afero.Fs
 }
 
+// nolint:funlen
 func BuildRootCommand(opts Opts) *cobra.Command {
 	flags := lib.Flags{}
 
@@ -55,19 +56,27 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 				return fmt.Errorf("initializing config: %w", err)
 			}
 
-			logger := log.New(opts.Out, flags.Debug)
+			logger := log.New(opts.Out, flags.Verbose)
 			logger.Debugln("Using config file:", viper.ConfigFileUsed())
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger := log.New(opts.Out, flags.Debug)
+			logger := log.New(opts.Out, flags.Verbose)
 
 			if len(args) == 0 {
 				return cmd.Help()
 			}
 
-			return clonerepo.Run(logger, args)
+			gitDir := viper.GetString("gitDir")
+
+			clonerepoOpts := clonerepo.Opts{
+				Logger:             logger,
+				DryRun:             flags.DryRun,
+				PrintOutputDirFlag: flags.PrintOutputDirFlag,
+			}
+
+			return clonerepo.Run(clonerepoOpts, gitDir, args)
 		},
 	}
 
@@ -81,20 +90,26 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		"config file (default is: If $HOME/.config exists, it will be "+
 			"$HOME/.config/clonerepo/config.yaml. If not, it will be $HOME/.clonerepo.yaml)")
 
-	cmd.PersistentFlags().StringVarP(
+	cmd.PersistentFlags().BoolVarP(
 		&flags.PrintOutputDirFlag,
 		"print-output-dir",
 		"p",
-		"",
-		"Use 'sh' to print a cd command to change to the resulting directory, or 'fish' "+
-			"to print the resulting directory")
+		true,
+		"Prints the path of the cloned directory")
 
 	cmd.PersistentFlags().BoolVarP(
-		&flags.Debug,
-		"debug",
+		&flags.DryRun,
+		"dry-run",
 		"d",
 		false,
-		"Enables debug output")
+		"Dry run, don't do any changes")
+
+	cmd.PersistentFlags().BoolVarP(
+		&flags.Verbose,
+		"verbose",
+		"v",
+		false,
+		"Enables verbose output")
 
 	return cmd
 }

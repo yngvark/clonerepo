@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func New(out io.Writer, debug bool) *logrus.Logger {
+func New(out io.Writer, verbose bool) *logrus.Logger {
 	logger := logrus.New()
 	logger.Out = out
 	logger.Formatter = &logrus.TextFormatter{
@@ -15,7 +15,7 @@ func New(out io.Writer, debug bool) *logrus.Logger {
 	}
 	logger.Level = logrus.InfoLevel
 
-	if debug {
+	if verbose {
 		logger.Level = logrus.TraceLevel
 	}
 
