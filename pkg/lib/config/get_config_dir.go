@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/afero"
 	"os"
 	"path"
+
+	"github.com/spf13/afero"
 )
 
 const (

@@ -1,8 +1,9 @@
 package parse_git_uri_test
 
 import (
-	"github.com/yngvark.com/clonerepo/pkg/clonerepo/parse_git_uri"
 	"testing"
+
+	"github.com/yngvark.com/clonerepo/pkg/clonerepo/parse_git_uri"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -61,6 +62,8 @@ func TestGitUriParserErrors(t *testing.T) {
 }
 
 func TestGitUriParser(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name       string
 		gitUri     string
@@ -88,7 +91,7 @@ func TestGitUriParser(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc //nolint:varnamelen
+		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()

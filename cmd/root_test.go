@@ -2,12 +2,13 @@ package cmd_test
 
 import (
 	"bytes"
-	"github.com/spf13/afero"
-	"github.com/stretchr/testify/require"
-	"github.com/yngvark.com/clonerepo/cmd"
 	"io/ioutil"
 	"strings"
 	"testing"
+
+	"github.com/spf13/afero"
+	"github.com/stretchr/testify/require"
+	"github.com/yngvark.com/clonerepo/cmd"
 
 	goldiePkg "github.com/sebdah/goldie/v2"
 	"github.com/stretchr/testify/assert"
@@ -55,7 +56,7 @@ func TestCloneRepo(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc //nolint:varnamelen
+		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
 			// Given
@@ -126,12 +127,12 @@ func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
 	goldieFilenameStderr := goldieFilenameBase + "-stderr"
 
 	if len(stdout.Bytes()) > 0 {
-		//goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
+		// goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 		goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
 	}
 
 	if len(stderr.Bytes()) > 0 {
-		//goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
+		// goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
 		goldie.Assert(t, goldieFilenameStderr, stderr.Bytes())
 	}
 }

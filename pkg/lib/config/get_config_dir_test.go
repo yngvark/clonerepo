@@ -1,13 +1,14 @@
 package config_test
 
 import (
+	"os"
+	"path"
+	"testing"
+
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/yngvark.com/clonerepo/pkg/lib/config"
-	"os"
-	"path"
-	"testing"
 )
 
 const (
@@ -90,5 +91,4 @@ func TestConfigDir(t *testing.T) {
 			assert.Equal(t, tc.expectedConfigFilePath, configFilePath)
 		})
 	}
-
 }

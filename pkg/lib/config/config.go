@@ -2,11 +2,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/afero"
-	"github.com/spf13/viper"
-	"github.com/yngvark.com/clonerepo/pkg/lib"
 	"io"
 	"os"
+
+	"github.com/spf13/afero"
+	"github.com/spf13/viper"
 )
 
 type Opts struct {
@@ -43,9 +43,5 @@ func Init(initOpts Opts, cfgFile string) error {
 		fmt.Fprintln(initOpts.Out, err.Error())
 	}
 
-	return nil
-}
-
-func config(flags lib.Flags, out io.Writer, args []string) error {
 	return nil
 }
