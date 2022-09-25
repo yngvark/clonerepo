@@ -4,5 +4,8 @@ Usage:
   clonerepo [flags]
 
 Flags:
-  -h, --help                      help for clonerepo
-  -p, --print-output-dir string   Use 'sh' to print a cd command to change to the resulting directory, or 'fish' to print the resulting directory
+  -o, --cd-to-output-dir   Outputs 'cd <cloned dir>' to stdout, which can be used for sourcing in a shell script. (default true)
+      --config string      config file (default is: If $HOME/.config exists, it will be $HOME/.config/clonerepo/config.yaml. If not, it will be $HOME/.clonerepo.yaml)
+  -d, --dry-run            Dry run, don't do any changes
+  -h, --help               help for clonerepo
+  -v, --verbose            Enables verbose output
