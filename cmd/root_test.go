@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"bytes"
+	"github.com/yngvark.com/clonerepo/pkg/lib/log"
 	"strings"
 	"testing"
 
@@ -35,23 +36,6 @@ func TestCloneRepo(t *testing.T) {
 			args:        []string{"git@github.com:someorg/somerepo.git"},
 			expectError: true,
 		},
-		//{
-		//	name: "Should write initial configuration if it's missing",
-		//	args: []string{"--verbose", "git@github.com:some-org/some-repo.git"},
-		//	asserts: func(t *testing.T, opts testOpts) {
-		//		t.Helper()
-		//
-		//		configFilename := "TODO"
-		//		configFile, err := opts.cmdOpts.FileSystem.Open(configFilename)
-		//		require.NoError(t, err)
-		//
-		//		configFileContents, err := ioutil.ReadAll(configFile)
-		//		require.NoError(t, err)
-		//
-		//		goldie := goldiePkg.New(t)
-		//		goldie.Assert(t, t.Name(), configFileContents)
-		//	},
-		//},
 		{
 			name: "Should clone repository to expected directory",
 			args: []string{"git@github.com:some-org/some-repo.git"},
@@ -62,8 +46,9 @@ func TestCloneRepo(t *testing.T) {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
-			// Given
 			t.Parallel()
+
+			// Given
 			var err error
 			opts := testOpts{}
 
@@ -80,10 +65,14 @@ func TestCloneRepo(t *testing.T) {
 
 			var stdout, stderr bytes.Buffer
 
+			logger := log.New(&stdout)
+
 			cmdOpts := cmd.Opts{
 				Out:        &stdout,
 				Err:        &stderr,
 				FileSystem: afero.NewMemMapFs(),
+				Logger:     logger,
+				Gitter:     newTestGitter(),
 			}
 			opts.cmdOpts = cmdOpts
 
@@ -129,6 +118,7 @@ func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
 	goldieFilenameStdout := goldieFilenameBase + "-stdout"
 	goldieFilenameStderr := goldieFilenameBase + "-stderr"
 
+	goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
 	if len(stdout.Bytes()) > 0 {
 		// goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 		goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())

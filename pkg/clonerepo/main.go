@@ -3,6 +3,7 @@ package clonerepo
 import (
 	"bytes"
 	"fmt"
+	"github.com/yngvark.com/clonerepo/pkg/git"
 	"os"
 	"os/exec"
 	"path"
@@ -13,9 +14,14 @@ import (
 )
 
 type Opts struct {
-	Logger        *logrus.Logger
+	Logger *logrus.Logger
+	Gitter git.Gitter
+
 	DryRun        bool
 	CdToOutputDir bool
+}
+
+type Logger interface {
 }
 
 func Run(opts Opts, gitDir string, args []string) error {
@@ -76,20 +82,7 @@ func gitClone(opts Opts, gitUri string, targetCloneDir string) error {
 		return nil
 	}
 
-	cmd := exec.Command("git", "clone", gitUri)
-	cmd.Dir = targetCloneDir
-
-	stderr := new(bytes.Buffer)
-	cmd.Stderr = stderr
-
-	err := cmd.Run()
-	if err != nil {
-		logError(opts.Logger, cmd, stderr)
-
-		return fmt.Errorf("running command: %w", err)
-	}
-
-	return nil
+	return opts.Gitter.Clone(gitUri, targetCloneDir)
 }
 
 func gitPull(opts Opts, gitCloneDir string) error {
@@ -99,22 +92,7 @@ func gitPull(opts Opts, gitCloneDir string) error {
 		return nil
 	}
 
-	opts.Logger.Debugf("Running git pull in " + gitCloneDir)
-
-	cmd := exec.Command("git", "pull")
-	cmd.Dir = gitCloneDir
-
-	stderr := new(bytes.Buffer)
-	cmd.Stderr = stderr
-
-	err := cmd.Run()
-	if err != nil {
-		logError(opts.Logger, cmd, stderr)
-
-		return fmt.Errorf("running command: %w", err)
-	}
-
-	return nil
+	return opts.Gitter.Pull(gitCloneDir)
 }
 
 func logError(logger *logrus.Logger, cmd *exec.Cmd, stderr *bytes.Buffer) {

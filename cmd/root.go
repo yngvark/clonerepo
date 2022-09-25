@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
+	"github.com/yngvark.com/clonerepo/pkg/git"
 	"io"
 	"os"
 
@@ -19,13 +21,25 @@ import (
 )
 
 const cmdShort = "clonerepo clones git repositores into a pre-determined directory structure, and " +
-	"then `cd`s into the cloned directory."
+	"then cd-s into the cloned directory."
+
+type Opts struct {
+	Out        io.Writer
+	Err        io.Writer
+	FileSystem afero.Fs
+	Logger     *logrus.Logger
+	Gitter     git.Gitter
+}
 
 func Run() {
+	logger := log.New(os.Stdout)
+
 	cmd := BuildRootCommand(Opts{
 		Out:        os.Stdout,
 		Err:        os.Stderr,
 		FileSystem: afero.NewOsFs(),
+		Logger:     logger,
+		Gitter:     git.New(logger),
 	})
 
 	if err := cmd.Execute(); err != nil {
@@ -46,14 +60,15 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 				return fmt.Errorf("initializing config: %w", err)
 			}
 
-			logger := log.New(opts.Out, flags.Verbose)
-			logger.Debugln("Using config file:", viper.ConfigFileUsed())
+			if flags.Verbose {
+				opts.Logger.SetLevel(logrus.DebugLevel)
+			}
+
+			opts.Logger.Debugln("Using config file:", viper.ConfigFileUsed())
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger := log.New(opts.Out, flags.Verbose)
-
 			if len(args) == 0 {
 				return cmd.Help()
 			}
@@ -61,7 +76,8 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 			gitDir := viper.GetString("gitDir")
 
 			clonerepoOpts := clonerepo.Opts{
-				Logger:        logger,
+				Logger:        opts.Logger,
+				Gitter:        opts.Gitter,
 				DryRun:        flags.DryRun,
 				CdToOutputDir: flags.CdToOutputDir,
 			}
@@ -102,10 +118,4 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		"Enables verbose output")
 
 	return cmd
-}
-
-type Opts struct {
-	Out        io.Writer
-	Err        io.Writer
-	FileSystem afero.Fs
 }
