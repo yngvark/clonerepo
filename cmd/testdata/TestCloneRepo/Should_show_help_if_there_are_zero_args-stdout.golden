@@ -1,4 +1,4 @@
-clonerepo clones git repositores into a pre-determined directory structure, and then `cd`s into the cloned directory.
+clonerepo clones git repositores into a pre-determined directory structure, and then cd-s into the cloned directory.
 
 Usage:
   clonerepo [flags]

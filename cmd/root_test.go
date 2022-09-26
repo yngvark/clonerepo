@@ -118,7 +118,12 @@ func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
 	goldieFilenameStdout := goldieFilenameBase + "-stdout"
 	goldieFilenameStderr := goldieFilenameBase + "-stderr"
 
+	goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 	goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
+
+	goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
+	goldie.Assert(t, goldieFilenameStderr, stderr.Bytes())
+
 	if len(stdout.Bytes()) > 0 {
 		// goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 		goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
