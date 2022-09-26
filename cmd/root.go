@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"github.com/yngvark.com/clonerepo/pkg/git"
 	"io"
 	"os"
+
+	"github.com/sirupsen/logrus"
+	"github.com/yngvark.com/clonerepo/pkg/git"
 
 	"github.com/spf13/viper"
 	"github.com/yngvark.com/clonerepo/pkg/lib/log"
@@ -28,7 +29,7 @@ type Opts struct {
 	Err        io.Writer
 	FileSystem afero.Fs
 	Logger     *logrus.Logger
-	Gitter     git.Gitter
+	Gitter     clonerepo.Gitter
 }
 
 func Run() {
@@ -47,6 +48,7 @@ func Run() {
 	}
 }
 
+// nolint:funlen
 func BuildRootCommand(opts Opts) *cobra.Command {
 	flags := lib.Flags{}
 

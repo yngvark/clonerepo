@@ -2,9 +2,10 @@ package cmd_test
 
 import (
 	"bytes"
-	"github.com/yngvark.com/clonerepo/pkg/lib/log"
 	"strings"
 	"testing"
+
+	"github.com/yngvark.com/clonerepo/pkg/lib/log"
 
 	"github.com/spf13/afero"
 	"github.com/yngvark.com/clonerepo/cmd"
@@ -113,10 +114,10 @@ func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
 	goldieFilenameStdout := goldieFilenameBase + "-stdout"
 	goldieFilenameStderr := goldieFilenameBase + "-stderr"
 
-	//goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
+	// goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 	goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
 
-	//goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
+	// goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
 	goldie.Assert(t, goldieFilenameStderr, stderr.Bytes())
 }
 

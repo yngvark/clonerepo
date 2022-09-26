@@ -6,11 +6,6 @@ import (
 	"os/exec"
 )
 
-type Gitter interface {
-	Clone(gitUri string, targetCloneDir string) error
-	Pull(gitCloneDir string) error
-}
-
 type Logger interface {
 	Debugf(format string, v ...interface{})
 	Errorf(format string, v ...interface{})
@@ -61,7 +56,7 @@ func (g DefaultGitter) logError(cmd *exec.Cmd, stderr *bytes.Buffer) {
 		"Stderr:\n---\n%s---\n", cmd.String(), cmd.Dir, stderr.String())
 }
 
-func New(logger Logger) Gitter {
+func New(logger Logger) DefaultGitter {
 	return DefaultGitter{
 		logger: logger,
 	}

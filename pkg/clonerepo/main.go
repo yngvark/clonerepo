@@ -1,11 +1,8 @@
 package clonerepo
 
 import (
-	"bytes"
 	"fmt"
-	"github.com/yngvark.com/clonerepo/pkg/git"
 	"os"
-	"os/exec"
 	"path"
 
 	"github.com/sirupsen/logrus"
@@ -15,13 +12,10 @@ import (
 
 type Opts struct {
 	Logger *logrus.Logger
-	Gitter git.Gitter
+	Gitter Gitter
 
 	DryRun        bool
 	CdToOutputDir bool
-}
-
-type Logger interface {
 }
 
 func Run(opts Opts, gitDir string, args []string) error {
@@ -93,9 +87,4 @@ func gitPull(opts Opts, gitCloneDir string) error {
 	}
 
 	return opts.Gitter.Pull(gitCloneDir)
-}
-
-func logError(logger *logrus.Logger, cmd *exec.Cmd, stderr *bytes.Buffer) {
-	logger.Errorf("Error! Command '%s' in directory '%s' failed. "+
-		"Stderr:\n---\n%s---\n", cmd.String(), cmd.Dir, stderr.String())
 }
