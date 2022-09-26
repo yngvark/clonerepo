@@ -2,6 +2,9 @@ package cmd_test
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/stretchr/testify/require"
+	"github.com/yngvark.com/clonerepo/pkg/lib/config"
 	"strings"
 	"testing"
 
@@ -21,7 +24,7 @@ func TestCloneRepo(t *testing.T) {
 		name        string
 		args        []string
 		expectError bool
-		asserts     func(t *testing.T, opts testOpts)
+		asserts     func(t *testing.T, opts cmd.Opts)
 	}{
 		{
 			name: "Should show help if there are zero args",
@@ -46,31 +49,28 @@ func TestCloneRepo(t *testing.T) {
 
 			// Given
 			var err error
-			opts := testOpts{}
-
-			/*
-				storage, err := store.NewTemporaryStorage()
-				assert.NoError(t, err)
-
-				//c.Env = []string{
-				//	fmt.Sprintf("%s=%s", clonerepo.ENV_GCLONE_GIT_DIR, storage.BasePath),
-				//	//"INTERNAL__CLONE_TEST_REPO=true",
-				//	fmt.Sprintf("PATH=%s:%s", build_executable.ProjectBuildDir(), os.Getenv("PATH")),
-				//}
-			*/
 
 			var stdout, stderr bytes.Buffer
 
 			logger := log.New(&stdout)
 
 			cmdOpts := cmd.Opts{
-				Out:        &stdout,
-				Err:        &stderr,
-				FileSystem: afero.NewMemMapFs(),
-				Logger:     logger,
-				Gitter:     newTestGitter(),
+				Out:    &stdout,
+				Err:    &stderr,
+				Logger: logger,
+				Gitter: newTestGitter(),
+				OsOpts: config.OsOpts{
+					UserHomeDir: func() (string, error) {
+						return "/home/bob", nil
+					},
+					LookupEnv: func(key string) (string, bool) {
+						return "", false
+					},
+					Fs: afero.NewMemMapFs(),
+				},
 			}
-			opts.cmdOpts = cmdOpts
+
+			createConfigFile(t, cmdOpts.OsOpts.Fs)
 
 			command := cmd.BuildRootCommand(cmdOpts)
 			command.SetArgs(tc.args)
@@ -88,7 +88,7 @@ func TestCloneRepo(t *testing.T) {
 
 			// Then
 			if tc.asserts != nil {
-				tc.asserts(t, opts)
+				tc.asserts(t, cmdOpts)
 			}
 
 			if tc.expectError {
@@ -100,6 +100,22 @@ func TestCloneRepo(t *testing.T) {
 			doGoldieAssert(t, stdout, stderr)
 		})
 	}
+}
+
+func createConfigFile(t *testing.T, fs afero.Fs) {
+	err := fs.MkdirAll(fmt.Sprintf("/home/bob/.config/%s", config.Dir), 0700)
+	require.NoError(t, err)
+
+	configFile, err := fs.Create(fmt.Sprintf(
+		"/home/bob/.config/%s/%s", config.Dir, config.FileNameWhenInConfigFolder))
+	require.NoError(t, err)
+
+	err = fs.MkdirAll("/home/bob/git", 0o777)
+	require.NoError(t, err)
+
+	_, err = configFile.WriteString("gitDir: /home/bob/git")
+	require.NoError(t, err)
+
 }
 
 func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
@@ -114,13 +130,9 @@ func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
 	goldieFilenameStdout := goldieFilenameBase + "-stdout"
 	goldieFilenameStderr := goldieFilenameBase + "-stderr"
 
-	// goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
+	//goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 	goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
 
-	// goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
+	//goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
 	goldie.Assert(t, goldieFilenameStderr, stderr.Bytes())
-}
-
-type testOpts struct {
-	cmdOpts cmd.Opts
 }

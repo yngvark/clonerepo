@@ -25,22 +25,26 @@ const cmdShort = "clonerepo clones git repositores into a pre-determined directo
 	"then cd-s into the cloned directory."
 
 type Opts struct {
-	Out        io.Writer
-	Err        io.Writer
-	FileSystem afero.Fs
-	Logger     *logrus.Logger
-	Gitter     clonerepo.Gitter
+	Out    io.Writer
+	Err    io.Writer
+	Logger *logrus.Logger
+	Gitter clonerepo.Gitter
+	OsOpts config.OsOpts
 }
 
 func Run() {
 	logger := log.New(os.Stdout)
 
 	cmd := BuildRootCommand(Opts{
-		Out:        os.Stdout,
-		Err:        os.Stderr,
-		FileSystem: afero.NewOsFs(),
-		Logger:     logger,
-		Gitter:     git.New(logger),
+		Out:    os.Stdout,
+		Err:    os.Stderr,
+		Logger: logger,
+		Gitter: git.New(logger),
+		OsOpts: config.OsOpts{
+			UserHomeDir: os.UserHomeDir,
+			LookupEnv:   os.LookupEnv,
+			Fs:          afero.NewOsFs(),
+		},
 	})
 
 	if err := cmd.Execute(); err != nil {
@@ -57,7 +61,7 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		Short:        cmdShort,
 		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			err := config.Init(opts.FileSystem, flags.ConfigFile)
+			err := config.Init(opts.OsOpts, flags.ConfigFile)
 			if err != nil {
 				return fmt.Errorf("initializing config: %w", err)
 			}
@@ -78,6 +82,7 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 			gitDir := viper.GetString("gitDir")
 
 			clonerepoOpts := clonerepo.Opts{
+				Out:           opts.Out,
 				Logger:        opts.Logger,
 				Gitter:        opts.Gitter,
 				DryRun:        flags.DryRun,

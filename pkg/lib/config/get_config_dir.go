@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-
-	"github.com/spf13/afero"
 )
 
 const (
@@ -14,16 +12,11 @@ const (
 	FileNameWhenHomeDir        = ".clonerepo.yaml"
 )
 
-type OsOpts struct {
-	UserHomeDir OsUserHomeDirFunc
-	LookupEnv   OsLookupEnvFunc
-}
-
 type OsUserHomeDirFunc func() (string, error)
 
 type OsLookupEnvFunc func(string) (string, bool)
 
-func GetConfigFilePath(fs afero.Fs, opts OsOpts) (string, error) {
+func GetConfigFilePath(opts OsOpts) (string, error) {
 	home, err := opts.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("getting user's home directory: %w", err)
@@ -39,7 +32,7 @@ func GetConfigFilePath(fs afero.Fs, opts OsOpts) (string, error) {
 	// Use dir $HOME/.config if it exists, if not use $HOME
 	//
 	pathHomeConfig := path.Join(home, ".config")
-	_, err = fs.Stat(pathHomeConfig)
+	_, err = opts.Fs.Stat(pathHomeConfig)
 
 	switch {
 	case err != nil && !os.IsNotExist(err):

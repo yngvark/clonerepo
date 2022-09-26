@@ -2,10 +2,8 @@ package config
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-
 	"github.com/spf13/afero"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 )
@@ -13,25 +11,22 @@ import (
 // Init initializes the program's configuration.
 //
 // Inspired by: https://github.com/spf13/cobra/blob/main/user_guide.md#create-rootcmd
-func Init(fs afero.Fs, cfgFilepath string) error {
+func Init(osOpts OsOpts, cfgFilepath string) error {
 	var err error
 
-	opts := OsOpts{
-		UserHomeDir: os.UserHomeDir,
-		LookupEnv:   os.LookupEnv,
-	}
-
 	if cfgFilepath == "" {
-		cfgFilepath, err = GetConfigFilePath(fs, opts)
+		cfgFilepath, err = GetConfigFilePath(osOpts)
 		if err != nil {
 			return fmt.Errorf("getting config file path: %w", err)
 		}
 	}
 
-	err = createMissingParentDirectories(cfgFilepath)
+	err = createMissingParentDirectories(osOpts.Fs, cfgFilepath)
 	if err != nil {
 		return fmt.Errorf("creating dir for config file '%s': %w", cfgFilepath, err)
 	}
+
+	viper.SetFs(osOpts.Fs)
 
 	// We need to set config file explicitly, because viper doesn't handle creating directory that
 	// do not exist.
@@ -49,9 +44,9 @@ func Init(fs afero.Fs, cfgFilepath string) error {
 	return nil
 }
 
-func createMissingParentDirectories(cfgFilepath string) error {
+func createMissingParentDirectories(fs afero.Fs, cfgFilepath string) error {
 	dir := filepath.Dir(cfgFilepath)
 
 	// nolint:gomnd
-	return os.MkdirAll(dir, 0o700)
+	return fs.MkdirAll(dir, 0o700)
 }

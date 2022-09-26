@@ -3,6 +3,7 @@ module github.com/yngvark.com/clonerepo
 go 1.18
 
 require (
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/sebdah/goldie/v2 v2.5.3
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/afero v1.1.2

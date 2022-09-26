@@ -2,15 +2,18 @@ package clonerepo
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path"
 
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/sirupsen/logrus"
 
 	"github.com/yngvark.com/clonerepo/pkg/clonerepo/parse_git_uri"
 )
 
 type Opts struct {
+	Out    io.Writer
 	Logger *logrus.Logger
 	Gitter Gitter
 
@@ -19,19 +22,31 @@ type Opts struct {
 }
 
 func Run(opts Opts, gitDir string, args []string) error {
-	gitUri := args[0]
+	// Validate
+	err := validation.Validate(gitDir, validation.Required)
+	if err != nil {
+		return fmt.Errorf("gitDir validation error: %w", err)
+	}
 
+	err = validation.Validate(args[0], validation.Required)
+	if err != nil {
+		return fmt.Errorf("args[0] validation error: %w", err)
+	}
+
+	gitUri := args[0]
 	opts.Logger.Debugln("Git dir: " + gitDir)
 
+	// Get org and repo
 	org, repo, err := parse_git_uri.GetOrgAndRepoFromGitUri(gitUri)
 	if err != nil {
 		return fmt.Errorf("parsing git organization and repository: %w", err)
 	}
 
+	// Get paths
 	dirToRunGitCloneIn := path.Join(gitDir, org)
-
 	clonedDir := path.Join(gitDir, org, repo)
 
+	// Git clone or pull
 	cloneDirExists, err := dirExists(clonedDir)
 	if err != nil {
 		return fmt.Errorf("checking if directory '%s' exists: %w", clonedDir, err)
@@ -50,7 +65,7 @@ func Run(opts Opts, gitDir string, args []string) error {
 	}
 
 	if opts.CdToOutputDir {
-		fmt.Println("cd " + dirToRunGitCloneIn)
+		fmt.Fprintln(opts.Out, "cd "+clonedDir)
 	}
 
 	return nil

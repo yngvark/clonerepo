@@ -37,9 +37,15 @@ go install https://github.com/yngvark/clonerepo
 * We need to tell `clonerepo` where it should store repositories.
 
 ```sh
-clonerepo config gitDir=$HOME/git # Replace directory with your preference
+mkdir -p ~/.config/clonerepo
+
+# Replace directory below with your preferred directory for keeping repositories
+echo "gitDir: $HOME/git" >> ~/.config/clonerepo/config.yaml
 ```
 
+clonerepo config gitDir=$HOME/git # Replace directory with your preference
+
+```
 * Now, try cloning a directory:
 
 Bash/Zsh:
