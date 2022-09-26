@@ -65,17 +65,18 @@ func TestConfigDir(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			osOpts := config.OsOpts{
-				UserHomeDir: func() (string, error) {
-					return "/home/bob", nil
-				},
-			}
-
 			var fs afero.Fs
 			if tc.fs == nil {
 				fs = afero.NewMemMapFs()
 			} else {
 				fs = tc.fs
+			}
+
+			osOpts := config.OsOpts{
+				UserHomeDir: func() (string, error) {
+					return "/home/bob", nil
+				},
+				Fs: fs,
 			}
 
 			if tc.osLookupEnvFunc == nil {
@@ -86,7 +87,7 @@ func TestConfigDir(t *testing.T) {
 				osOpts.LookupEnv = tc.osLookupEnvFunc
 			}
 
-			configFilePath, err := config.GetConfigFilePath(fs, osOpts)
+			configFilePath, err := config.GetConfigFilePath(osOpts)
 			require.NoError(t, err)
 
 			t.Log("Expected config file path:", tc.expectedConfigFilePath)

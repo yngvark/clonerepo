@@ -25,7 +25,7 @@ fmt: install-gofumpt ## -
 lint: install-lint ## -
 	golangci-lint run ./...
 
-check: fmt lint ## Run fmt and lint (so you have one command use in your dev flow instead of two)
+check: fmt lint test ## Run fmt and lint (so you have one command use in your dev flow instead of two)
 
 #
 # Installations

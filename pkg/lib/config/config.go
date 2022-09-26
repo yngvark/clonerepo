@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/afero"
 	"path/filepath"
+
+	"github.com/spf13/afero"
 
 	"github.com/spf13/viper"
 )

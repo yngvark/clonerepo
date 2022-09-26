@@ -34,6 +34,7 @@ func Run(opts Opts, gitDir string, args []string) error {
 	}
 
 	gitUri := args[0]
+
 	opts.Logger.Debugln("Git dir: " + gitDir)
 
 	// Get org and repo

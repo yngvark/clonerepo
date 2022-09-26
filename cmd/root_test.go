@@ -3,10 +3,11 @@ package cmd_test
 import (
 	"bytes"
 	"fmt"
-	"github.com/stretchr/testify/require"
-	"github.com/yngvark.com/clonerepo/pkg/lib/config"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/yngvark.com/clonerepo/pkg/lib/config"
 
 	"github.com/yngvark.com/clonerepo/pkg/lib/log"
 
@@ -103,7 +104,9 @@ func TestCloneRepo(t *testing.T) {
 }
 
 func createConfigFile(t *testing.T, fs afero.Fs) {
-	err := fs.MkdirAll(fmt.Sprintf("/home/bob/.config/%s", config.Dir), 0700)
+	t.Helper()
+
+	err := fs.MkdirAll(fmt.Sprintf("/home/bob/.config/%s", config.Dir), 0o700)
 	require.NoError(t, err)
 
 	configFile, err := fs.Create(fmt.Sprintf(
@@ -115,7 +118,6 @@ func createConfigFile(t *testing.T, fs afero.Fs) {
 
 	_, err = configFile.WriteString("gitDir: /home/bob/git")
 	require.NoError(t, err)
-
 }
 
 func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
@@ -130,9 +132,9 @@ func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
 	goldieFilenameStdout := goldieFilenameBase + "-stdout"
 	goldieFilenameStderr := goldieFilenameBase + "-stderr"
 
-	//goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
+	// goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 	goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
 
-	//goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
+	// goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
 	goldie.Assert(t, goldieFilenameStderr, stderr.Bytes())
 }
