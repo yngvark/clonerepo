@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# USAGE: . clonerepo <repo URI>
+
+ME=$(readlink "${BASH_SOURCE[0]}")
+# APP_DIR=$(dirname "$ME")
+
+# shellcheck disable=SC2068
+"clonerepo2" $@ > /tmp/gclone_output_023mf023mf
+EXIT_CODE=$?
+
+# Error checking
+if [[ $EXIT_CODE != 0 ]]; then
+    cat /tmp/gclone_output_023mf023mf
+    exit $EXIT_CODE
+fi
+
+source /tmp/gclone_output_023mf023mf
