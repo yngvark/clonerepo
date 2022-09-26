@@ -27,18 +27,13 @@ func TestCloneRepo(t *testing.T) {
 			args: []string{},
 		},
 		{
+			name: "Should clone repository to expected directory",
+			args: []string{"git@github.com:some-org/some-repo.git"},
+		},
+		{
 			name:        "Should return error if git URI is invalid",
 			args:        []string{"git@github.com:someorg-somerepo.git"}, // Correct is git@github.com:someorg/somerepo.git
 			expectError: true,
-		},
-		{
-			name:        "Should return error if config is missing",
-			args:        []string{"git@github.com:someorg/somerepo.git"},
-			expectError: true,
-		},
-		{
-			name: "Should clone repository to expected directory",
-			args: []string{"git@github.com:some-org/some-repo.git"},
 		},
 	}
 
