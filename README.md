@@ -27,7 +27,25 @@ Notice that `clonerepo` changed the current directory (where the parent path is 
 ## Install
 
 ```sh
-go install https://github.com/yngvark/clonerepo
+git clone https://github.com/yngvark/clonerepo.git
+cd clonerepo
+go install
+```
+
+Finalize with the steps below, depending on the shell you use.
+
+### Bash
+
+Add the following to your `.bashrc`:
+
+```sh
+source <path to cloned dir>/clonerepo_bash
+```
+
+### Fish
+
+```sh
+ln -s <path to cloned dir>/clone.fish ~/.config/fish/functions/clone.fish 
 ```
 
 ## Getting started

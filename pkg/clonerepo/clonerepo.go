@@ -66,7 +66,7 @@ func Run(opts Opts, gitDir string, args []string) error {
 	}
 
 	if opts.CdToOutputDir {
-		fmt.Fprintln(opts.Out, "cd "+clonedDir)
+		fmt.Fprintln(opts.Out, clonedDir)
 	}
 
 	return nil

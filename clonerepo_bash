@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+function clone() {
+  # shellcheck disable=SC2068
+  clonerepo $@
+}
