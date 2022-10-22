@@ -56,40 +56,36 @@ ln -s <path to cloned dir>/clone.fish ~/.config/fish/functions/clone.fish
 
 ```sh
 mkdir -p ~/.config/clonerepo
+```
 
-# Replace directory below with your preferred directory for keeping repositories
+Replace directory `$HOME/git` below with your preferred directory for keeping repositories:
+
+```sh
 echo "gitDir: $HOME/git" >> ~/.config/clonerepo/config.yaml
 ```
 
-clonerepo config gitDir=$HOME/git # Replace directory with your preference
-
-```
 * Now, try cloning a directory:
 
-Bash/Zsh:
-
 ```bash
-. clonerepo https://github.com/yngvark/clonerepo
+clone https://github.com/yngvark/clonerepo
 ```
 
-Fish (this requires [fish-source](#fish-shell-support):
-
-```fish
-fs clonerepo https://github.com/yngvark/clonerepo
-```
-
-* Notice how the current directory changed to `$HOME/git` - or whatever you set your `gitDir` to in the configuration above.
+* Notice how the current directory changed to `$HOME/git/clonerepo` - or whatever you set your `gitDir` to in the configuration above.
 
 ## Uninstall
+
+* Remove binary
 
 ```sh
 rm $GOBIN/clonerepo
 ```
 
+* Remove the Bash or Fish specific parts added under [Install](#Install)
+
 ## Usage
 
 ```sh
-$ clonerepo -h
+$ clone -h
 usage: clonerepo [-h] [-t] repoUri
 
 git clones a repo URI to the appropriate directory. Tip: use ". clonerepo <args>"
@@ -102,14 +98,3 @@ optional arguments:
   -h, --help  show this help message and exit
   -t, --temp  Clone the repository in a temporary directory
 ```
-
-### Fish shell support
-
-In Fish shell, `.` and `source` do not work. To support Fish, you can install [fish-source](https://github.com/yngvark/fish-source).
-
-You can then use `fs` as you would `.` or `source`, like this:
-
-```
-fs clonerepo https://github.com/yngvark/clonerepo.git
-```
-
