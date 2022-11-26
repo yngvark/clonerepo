@@ -54,6 +54,15 @@ func Run(opts Opts, gitDir string, args []string) error {
 	}
 
 	if !cloneDirExists {
+		// Organization directory might not exist, so we need to create it. For instance, if cloning
+		// https://github.com/some-org/hello.git
+		// we want it to be cloned into /home/myself/git/someOrg/hello
+		// However, someOrg might not have been created yet.
+		err = os.MkdirAll(dirToRunGitCloneIn, 0755)
+		if err != nil {
+			return fmt.Errorf("creating directory '%s': %w", dirToRunGitCloneIn, err)
+		}
+
 		err = gitClone(opts, gitUri, dirToRunGitCloneIn)
 		if err != nil {
 			return fmt.Errorf("running git clone: %w", err)

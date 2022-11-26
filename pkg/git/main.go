@@ -24,9 +24,7 @@ func (g DefaultGitter) Clone(gitUri string, targetCloneDir string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		g.logError(cmd, stderr)
-
-		return fmt.Errorf("running command: %w", err)
+		return g.newError(err, cmd, stderr)
 	}
 
 	return nil
@@ -43,17 +41,15 @@ func (g DefaultGitter) Pull(gitCloneDir string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		g.logError(cmd, stderr)
-
-		return fmt.Errorf("running command: %w", err)
+		return g.newError(err, cmd, stderr)
 	}
 
 	return nil
 }
 
-func (g DefaultGitter) logError(cmd *exec.Cmd, stderr *bytes.Buffer) {
-	g.logger.Errorf("Error! Command '%s' in directory '%s' failed. "+
-		"Stderr:\n---\n%s---\n", cmd.String(), cmd.Dir, stderr.String())
+func (g DefaultGitter) newError(err error, cmd *exec.Cmd, stderr *bytes.Buffer) error {
+	return fmt.Errorf("running command '%s' in directory '%s' failed. "+
+		"Stderr: %s. Error: %w", cmd.String(), cmd.Dir, stderr.String(), err)
 }
 
 func New(logger Logger) DefaultGitter {
