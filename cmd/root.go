@@ -82,11 +82,10 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 			gitDir := viper.GetString("gitDir")
 
 			clonerepoOpts := clonerepo.Opts{
-				Out:           opts.Out,
-				Logger:        opts.Logger,
-				Gitter:        opts.Gitter,
-				DryRun:        flags.DryRun,
-				CdToOutputDir: flags.CdToOutputDir,
+				Out:    opts.Out,
+				Logger: opts.Logger,
+				Gitter: opts.Gitter,
+				Flags:  flags,
 			}
 
 			return clonerepo.Run(clonerepoOpts, gitDir, args)

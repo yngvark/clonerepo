@@ -2,6 +2,7 @@ package clonerepo
 
 import (
 	"fmt"
+	"github.com/yngvark.com/clonerepo/pkg/lib"
 	"io"
 	"os"
 	"path"
@@ -17,8 +18,7 @@ type Opts struct {
 	Logger *logrus.Logger
 	Gitter Gitter
 
-	DryRun        bool
-	CdToOutputDir bool
+	Flags lib.Flags
 }
 
 func Run(opts Opts, gitDir string, args []string) error {
@@ -74,7 +74,7 @@ func Run(opts Opts, gitDir string, args []string) error {
 		}
 	}
 
-	if opts.CdToOutputDir {
+	if opts.Flags.CdToOutputDir {
 		fmt.Fprintln(opts.Out, clonedDir)
 	}
 
@@ -95,7 +95,7 @@ func dirExists(dir string) (bool, error) {
 }
 
 func gitClone(opts Opts, gitUri string, targetCloneDir string) error {
-	if opts.DryRun {
+	if opts.Flags.DryRun {
 		opts.Logger.Debugf("Skipping: git clone " + gitUri + " in " + targetCloneDir)
 
 		return nil
@@ -105,7 +105,7 @@ func gitClone(opts Opts, gitUri string, targetCloneDir string) error {
 }
 
 func gitPull(opts Opts, gitCloneDir string) error {
-	if opts.DryRun {
+	if opts.Flags.DryRun {
 		opts.Logger.Debugf("Skipping: git pull in " + gitCloneDir)
 
 		return nil

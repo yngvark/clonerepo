@@ -6,4 +6,5 @@ type Flags struct {
 	ConfigFile    string
 	DryRun        bool
 	Verbose       bool
+	Temporary     bool
 }
