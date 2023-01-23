@@ -55,7 +55,7 @@ func Run() {
 	}
 }
 
-// nolint:funlen
+//nolint:funlen
 func BuildRootCommand(opts Opts) *cobra.Command {
 	flags := lib.Flags{}
 

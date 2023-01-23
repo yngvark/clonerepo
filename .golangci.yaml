@@ -25,6 +25,7 @@ linters:
         - gci # It's just gets in the way too often with hard-to-understand messages.
         - ifshort # More hazzle than value
         - godot # There are valid exceptions
+        - nosnakecase # I disagree with this rule
 linters-settings:
     gci: # This is a workaround that should be removed, see
         # https://github.com/golangci/golangci-lint/issues/1490#issuecomment-1186947213

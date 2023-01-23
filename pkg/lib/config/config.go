@@ -48,6 +48,6 @@ func Init(osOpts OsOpts, cfgFilepath string) error {
 func createMissingParentDirectories(fs afero.Fs, cfgFilepath string) error {
 	dir := filepath.Dir(cfgFilepath)
 
-	// nolint:gomnd
+	//nolint:gomnd
 	return fs.MkdirAll(dir, 0o700)
 }
