@@ -41,7 +41,7 @@ endif
 # # https://golangci-lint.run/usage/install/#local-installation
 install-lint:
 ifneq ($(shell golangci-lint version --format short), 1.46.2)
-	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/9d9855c149a3d46410f0bf818ead38c9f445bbf1/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.46.2
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/6f7f8aebbee04a8f6acff8bb37ae86746b9e5e0d/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.50.1
 endif
 
 # https://github.com/kyoh86/richgo

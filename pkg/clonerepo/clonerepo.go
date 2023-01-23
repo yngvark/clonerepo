@@ -14,6 +14,8 @@ import (
 	"github.com/yngvark.com/clonerepo/pkg/clonerepo/parse_git_uri"
 )
 
+const fileMode = 0o755
+
 type Opts struct {
 	Out    io.Writer
 	Logger *logrus.Logger
@@ -61,7 +63,7 @@ func Run(opts Opts, gitDir string, args []string) error {
 		// https://github.com/some-org/hello.git
 		// we want it to be cloned into /home/myself/git/someOrg/hello
 		// However, someOrg might not have been created yet.
-		err = opts.Fs.MkdirAll(dirToRunGitCloneIn, 0o755)
+		err = opts.Fs.MkdirAll(dirToRunGitCloneIn, fileMode)
 		if err != nil {
 			return fmt.Errorf("creating directory '%s': %w", dirToRunGitCloneIn, err)
 		}

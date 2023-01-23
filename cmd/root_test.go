@@ -48,12 +48,15 @@ func TestCloneRepo(t *testing.T) {
 			name: "Should clone to temporary directory if temporaryGitDir is set",
 			args: []string{"-t", "git@github.com:some-org/some-repo.git"},
 			preRun: func(t *testing.T, cmdOpts cmd.Opts) {
+				t.Helper()
+
 				fs := cmdOpts.OsOpts.Fs
 				configFile := getConfigFilename()
 				file, err := fs.OpenFile(configFile, os.O_APPEND, 0o600)
 				require.NoError(t, err)
 
 				_, err = file.WriteString(fmt.Sprintf("%s: /home/bob/tmp", cmd.TemporaryGitDirKey))
+				require.NoError(t, err)
 
 				err = file.Close()
 				require.NoError(t, err)
@@ -115,6 +118,8 @@ func TestCloneRepo(t *testing.T) {
 }
 
 func printConfigFile(t *testing.T, cmdOpts cmd.Opts, configFilename string) {
+	t.Helper()
+
 	t.Log("CONFIG FILE:")
 	t.Log("-------------------------------------------------")
 
@@ -129,6 +134,8 @@ func printConfigFile(t *testing.T, cmdOpts cmd.Opts, configFilename string) {
 }
 
 func printOutput(t *testing.T, stdout *bytes.Buffer, stderr *bytes.Buffer) {
+	t.Helper()
+
 	t.Log("PROGRAM OUTPUT:")
 	t.Log("-------------------------------------------------")
 	t.Log("stdout:")
