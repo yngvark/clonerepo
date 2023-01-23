@@ -2,9 +2,9 @@ package clonerepo
 
 import (
 	"fmt"
+	"github.com/spf13/afero"
 	"github.com/yngvark.com/clonerepo/pkg/lib"
 	"io"
-	"os"
 	"path"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -16,6 +16,7 @@ import (
 type Opts struct {
 	Out    io.Writer
 	Logger *logrus.Logger
+	Fs     afero.Fs
 	Gitter Gitter
 
 	Flags lib.Flags
@@ -48,7 +49,8 @@ func Run(opts Opts, gitDir string, args []string) error {
 	clonedDir := path.Join(gitDir, org, repo)
 
 	// Git clone or pull
-	cloneDirExists, err := dirExists(clonedDir)
+
+	cloneDirExists, err := afero.DirExists(opts.Fs, clonedDir)
 	if err != nil {
 		return fmt.Errorf("checking if directory '%s' exists: %w", clonedDir, err)
 	}
@@ -58,7 +60,7 @@ func Run(opts Opts, gitDir string, args []string) error {
 		// https://github.com/some-org/hello.git
 		// we want it to be cloned into /home/myself/git/someOrg/hello
 		// However, someOrg might not have been created yet.
-		err = os.MkdirAll(dirToRunGitCloneIn, 0755)
+		err = opts.Fs.MkdirAll(dirToRunGitCloneIn, 0755)
 		if err != nil {
 			return fmt.Errorf("creating directory '%s': %w", dirToRunGitCloneIn, err)
 		}
@@ -79,19 +81,6 @@ func Run(opts Opts, gitDir string, args []string) error {
 	}
 
 	return nil
-}
-
-func dirExists(dir string) (bool, error) {
-	_, err := os.Stat(dir)
-	if err == nil {
-		return true, nil
-	}
-
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-
-	return false, err
 }
 
 func gitClone(opts Opts, gitUri string, targetCloneDir string) error {

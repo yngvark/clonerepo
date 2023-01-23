@@ -8,4 +8,5 @@ Flags:
       --config string      config file (default is: If $HOME/.config exists, it will be $HOME/.config/clonerepo/config.yaml. If not, it will be $HOME/.clonerepo.yaml)
   -d, --dry-run            Dry run, don't do any changes
   -h, --help               help for clonerepo
+  -t, --temporary          Clone to temporary directory, as specified in the config file or /tmp if not specified.
   -v, --verbose            Enables verbose output

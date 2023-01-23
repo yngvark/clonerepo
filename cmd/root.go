@@ -21,8 +21,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const cmdShort = "clonerepo clones git repositores into a pre-determined directory structure, and " +
-	"then cd-s into the cloned directory."
+const (
+	TemporaryGitDirKey = "temporaryGitDir"
+	cmdShort           = "clonerepo clones git repositores into a pre-determined directory structure, and " +
+		"then cd-s into the cloned directory."
+)
 
 type Opts struct {
 	Out    io.Writer
@@ -79,11 +82,12 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 				return cmd.Help()
 			}
 
-			gitDir := viper.GetString("gitDir")
+			gitDir := getGitDir(flags.Temporary)
 
 			clonerepoOpts := clonerepo.Opts{
 				Out:    opts.Out,
 				Logger: opts.Logger,
+				Fs:     opts.OsOpts.Fs,
 				Gitter: opts.Gitter,
 				Flags:  flags,
 			}
@@ -117,6 +121,13 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		"Dry run, don't do any changes")
 
 	cmd.PersistentFlags().BoolVarP(
+		&flags.Temporary,
+		"temporary",
+		"t",
+		false,
+		"Clone to temporary directory, as specified in the config file or /tmp if not specified.")
+
+	cmd.PersistentFlags().BoolVarP(
 		&flags.Verbose,
 		"verbose",
 		"v",
@@ -124,4 +135,16 @@ func BuildRootCommand(opts Opts) *cobra.Command {
 		"Enables verbose output")
 
 	return cmd
+}
+
+func getGitDir(temporaryFlag bool) string {
+	if temporaryFlag {
+		if viper.IsSet(TemporaryGitDirKey) {
+			return viper.GetString(TemporaryGitDirKey)
+		} else {
+			return "/tmp"
+		}
+	} else {
+		return viper.GetString("gitDir")
+	}
 }

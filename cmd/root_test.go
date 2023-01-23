@@ -1,8 +1,11 @@
 package cmd_test
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/sirupsen/logrus"
+	"os"
 	"strings"
 	"testing"
 
@@ -26,6 +29,7 @@ func TestCloneRepo(t *testing.T) {
 		args        []string
 		expectError bool
 		asserts     func(t *testing.T, opts cmd.Opts)
+		preRun      func(t *testing.T, cmdOpts cmd.Opts)
 	}{
 		{
 			name: "Should show help if there are zero args",
@@ -34,6 +38,25 @@ func TestCloneRepo(t *testing.T) {
 		{
 			name: "Should clone repository to expected directory",
 			args: []string{"git@github.com:some-org/some-repo.git"},
+		},
+		{
+			name: "Should clone to root tmp directory if temporaryGitDir is unset",
+			args: []string{"-t", "git@github.com:some-org/some-repo.git"},
+		},
+		{
+			name: "Should clone to temporary directory if temporaryGitDir is set",
+			args: []string{"-t", "git@github.com:some-org/some-repo.git"},
+			preRun: func(t *testing.T, cmdOpts cmd.Opts) {
+				fs := cmdOpts.OsOpts.Fs
+				configFile := getConfigFilename()
+				file, err := fs.OpenFile(configFile, os.O_APPEND, 0o600)
+				require.NoError(t, err)
+
+				_, err = file.WriteString(fmt.Sprintf("%s: /home/bob/tmp", cmd.TemporaryGitDirKey))
+
+				err = file.Close()
+				require.NoError(t, err)
+			},
 		},
 		{
 			name:        "Should return error if git URI is invalid",
@@ -51,41 +74,28 @@ func TestCloneRepo(t *testing.T) {
 			// Given
 			var err error
 
-			var stdout, stderr bytes.Buffer
+			var stdout = &bytes.Buffer{}
+			var stderr = &bytes.Buffer{}
 
-			logger := log.New(&stdout)
+			logger := log.New(stdout)
 
-			cmdOpts := cmd.Opts{
-				Out:    &stdout,
-				Err:    &stderr,
-				Logger: logger,
-				Gitter: newTestGitter(),
-				OsOpts: config.OsOpts{
-					UserHomeDir: func() (string, error) {
-						return "/home/bob", nil
-					},
-					LookupEnv: func(key string) (string, bool) {
-						return "", false
-					},
-					Fs: afero.NewMemMapFs(),
-				},
-			}
+			cmdOpts := buildCmdOpts(stdout, stderr, logger)
 
-			createConfigFile(t, cmdOpts.OsOpts.Fs)
+			configFilename := createConfigFile(t, cmdOpts.OsOpts.Fs)
 
 			command := cmd.BuildRootCommand(cmdOpts)
 			command.SetArgs(tc.args)
 
+			if tc.preRun != nil {
+				tc.preRun(t, cmdOpts)
+			}
+
+			printConfigFile(t, cmdOpts, configFilename)
+
 			// When
 			err = command.Execute()
 
-			t.Log("PROGRAM OUTPUT:")
-			t.Log("-------------------------------------------------")
-			t.Log("stdout:")
-			t.Log(stdout.String())
-			t.Log("stderr:")
-			t.Log(stderr.String())
-			t.Log("-------------------------------------------------")
+			printOutput(t, stdout, stderr)
 
 			// Then
 			if tc.asserts != nil {
@@ -103,38 +113,87 @@ func TestCloneRepo(t *testing.T) {
 	}
 }
 
-func createConfigFile(t *testing.T, fs afero.Fs) {
+func printConfigFile(t *testing.T, cmdOpts cmd.Opts, configFilename string) {
+	t.Log("CONFIG FILE:")
+	t.Log("-------------------------------------------------")
+
+	configFile, err := cmdOpts.OsOpts.Fs.Open(configFilename)
+	require.NoError(t, err)
+
+	scanner := bufio.NewScanner(configFile)
+
+	for scanner.Scan() { // internally, it advances token based on sperator
+		fmt.Println(scanner.Text()) // token in unicode-char
+	}
+}
+
+func printOutput(t *testing.T, stdout *bytes.Buffer, stderr *bytes.Buffer) {
+	t.Log("PROGRAM OUTPUT:")
+	t.Log("-------------------------------------------------")
+	t.Log("stdout:")
+	t.Log(stdout.String())
+	t.Log("stderr:")
+	t.Log(stderr.String())
+	t.Log("-------------------------------------------------")
+}
+
+func buildCmdOpts(stdout *bytes.Buffer, stderr *bytes.Buffer, logger *logrus.Logger) cmd.Opts {
+	return cmd.Opts{
+		Out:    stdout,
+		Err:    stderr,
+		Logger: logger,
+		Gitter: newTestGitter(),
+		OsOpts: config.OsOpts{
+			UserHomeDir: func() (string, error) {
+				return "/home/bob", nil
+			},
+			LookupEnv: func(key string) (string, bool) {
+				return "", false
+			},
+			Fs: afero.NewMemMapFs(),
+		},
+	}
+}
+
+func createConfigFile(t *testing.T, fs afero.Fs) string {
 	t.Helper()
 
 	err := fs.MkdirAll(fmt.Sprintf("/home/bob/.config/%s", config.Dir), 0o700)
 	require.NoError(t, err)
 
-	configFile, err := fs.Create(fmt.Sprintf(
-		"/home/bob/.config/%s/%s", config.Dir, config.FileNameWhenInConfigFolder))
+	configFile, err := fs.Create(getConfigFilename())
 	require.NoError(t, err)
 
 	err = fs.MkdirAll("/home/bob/git", 0o777)
 	require.NoError(t, err)
 
-	_, err = configFile.WriteString("gitDir: /home/bob/git")
+	_, err = configFile.WriteString("gitDir: /home/bob/git\n")
 	require.NoError(t, err)
+
+	return configFile.Name()
 }
 
-func doGoldieAssert(t *testing.T, stdout bytes.Buffer, stderr bytes.Buffer) {
+func getConfigFilename() string {
+	return fmt.Sprintf(
+		"/home/bob/.config/%s/%s", config.Dir, config.FileNameWhenInConfigFolder)
+}
+
+func doGoldieAssert(t *testing.T, stdout *bytes.Buffer, stderr *bytes.Buffer) {
 	t.Helper()
 
 	goldie := goldiePkg.New(t)
 	t.Log(t.Name())
 
 	// Remove apostrophes, so we don't break importing our code as a library
-	goldieFilenameBase := strings.ReplaceAll(t.Name(), "'", "")
+	var goldieFilenameBase string = t.Name()
+	goldieFilenameBase = strings.ReplaceAll(goldieFilenameBase, "'", "")
 
 	goldieFilenameStdout := goldieFilenameBase + "-stdout"
 	goldieFilenameStderr := goldieFilenameBase + "-stderr"
 
-	// goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
+	//goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 	goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
 
-	// goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
+	//goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
 	goldie.Assert(t, goldieFilenameStderr, stderr.Bytes())
 }
