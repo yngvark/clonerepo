@@ -2,10 +2,11 @@ package clonerepo
 
 import (
 	"fmt"
-	"github.com/spf13/afero"
-	"github.com/yngvark.com/clonerepo/pkg/lib"
 	"io"
 	"path"
+
+	"github.com/spf13/afero"
+	"github.com/yngvark.com/clonerepo/pkg/lib"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/sirupsen/logrus"
@@ -60,7 +61,7 @@ func Run(opts Opts, gitDir string, args []string) error {
 		// https://github.com/some-org/hello.git
 		// we want it to be cloned into /home/myself/git/someOrg/hello
 		// However, someOrg might not have been created yet.
-		err = opts.Fs.MkdirAll(dirToRunGitCloneIn, 0755)
+		err = opts.Fs.MkdirAll(dirToRunGitCloneIn, 0o755)
 		if err != nil {
 			return fmt.Errorf("creating directory '%s': %w", dirToRunGitCloneIn, err)
 		}

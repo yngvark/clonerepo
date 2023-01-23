@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/stretchr/testify/require"
 	"github.com/yngvark.com/clonerepo/pkg/lib/config"
@@ -74,8 +75,8 @@ func TestCloneRepo(t *testing.T) {
 			// Given
 			var err error
 
-			var stdout = &bytes.Buffer{}
-			var stderr = &bytes.Buffer{}
+			stdout := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
 
 			logger := log.New(stdout)
 
@@ -191,9 +192,9 @@ func doGoldieAssert(t *testing.T, stdout *bytes.Buffer, stderr *bytes.Buffer) {
 	goldieFilenameStdout := goldieFilenameBase + "-stdout"
 	goldieFilenameStderr := goldieFilenameBase + "-stderr"
 
-	//goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
+	// goldie.Update(t, goldieFilenameStdout, stdout.Bytes())
 	goldie.Assert(t, goldieFilenameStdout, stdout.Bytes())
 
-	//goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
+	// goldie.Update(t, goldieFilenameStderr, stderr.Bytes())
 	goldie.Assert(t, goldieFilenameStderr, stderr.Bytes())
 }
