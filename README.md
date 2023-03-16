@@ -48,7 +48,8 @@ source <path to cloned dir>/clonerepo_bash
 ln -s <path to cloned dir>/clone.fish ~/.config/fish/functions/clone.fish 
 ```
 
-## Getting started
+### Add required configuration
+
 
 * Install `clonerepo` as shown above.
 
@@ -61,10 +62,12 @@ mkdir -p ~/.config/clonerepo
 Replace directory `$HOME/git` below with your preferred directory for keeping repositories:
 
 ```sh
-echo "gitDir: $HOME/git" >> ~/.config/clonerepo/config.yaml
+echo "gitDir: $HOME/git" > ~/.config/clonerepo/config.yaml
 ```
 
-* Now, try cloning a directory:
+## Getting started
+
+Now you can try cloning a directory:
 
 ```bash
 clone https://github.com/yngvark/clonerepo
