@@ -4,7 +4,7 @@
 
 It clones github repositores into a pre-determined directory structure, and then `cd`s into the cloned directory.
 
-:information_source: Tip: See also  [`newrepo`](https://github.com/yngvark/newrepo.git).  It creates git repositories into a pre-determined directory structure, and then `cd`s intog the directory containing the repository.
+:information_source: Tip: See also  [`newrepo`](https://github.com/yngvark/newrepo.git). It creates git repositories into a pre-determined directory structure, and then `cd`s into the directory containing the repository.
 
 **Example**
 
